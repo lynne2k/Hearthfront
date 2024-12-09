@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.IO;
 
 public class GameManager : MonoBehaviour
 {
@@ -11,20 +12,17 @@ public class GameManager : MonoBehaviour
 
 
 
-    public const int framePerTick = 30;
+    private const int framePerTick = 30;
 
 
-    public int currentTick = 0;
-    public int currentTickTimeDelta = 0;
-
-    
-    public int varFoo = 0;
-    public string varBar = "Player";
-    public Vector3Int varTestCoord = new Vector3Int(1, 3, 3);
+    private int currentTick = 0;
+    private int currentTickTimeDelta = 0;
 
     /* 全图Savable寄存 */
+    private const int chunk_size = 5;
+    private string[] snapshots = new string[chunk_size];
+    public bool isLock = false;
 
-    public List<string> snapshots = new List<string>();
     public Mobile[] allMobiles;
 
 
@@ -43,6 +41,11 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject); // Persist between scenes
 
         allMobiles = FindObjectsOfType<Mobile>();
+
+        // 初始时snapshot
+        /*Debug.Log($"tick: {currentTick}");*/
+        TakeSnapshot(currentTick);
+
     }
 
 
@@ -52,41 +55,48 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.R) && !isLock)
         {
-            LoadSnapshot(currentTick - 1);
-            currentTick--;
-            currentTickTimeDelta = 0;
-
+            isLock = true;
+            if (currentTick >= 1)
+            {
+                bool Loaded = LoadSnapshot();
+                if (Loaded)
+                {
+                    currentTick--;
+                    currentTickTimeDelta = 0;
+                }
+            }
+            isLock = false;
+            /*Debug.Log($"currentTick: {currentTick}");*/
         }
-        else if (Input.GetKeyDown(KeyCode.S))
-        {
-            //TakeSnapshot();
-
-        }
+        
     }
 
     private void FixedUpdate()
     {
-        /* time++； 如果到时间了就tick一次：更新所有东西  */
+        /*time++； 如果到时间了就tick一次：更新所有东西*/
 
-        currentTickTimeDelta++;
-        if ((currentTickTimeDelta+1) % framePerTick == 0)
+       currentTickTimeDelta++;
+        if ((currentTickTimeDelta + 1) % framePerTick == 0)
         {
+            isLock = true; // 设置读写锁
+
             currentTick++;
-            Debug.Log(currentTick);
-            TakeSnapshot();
+            TakeSnapshot(currentTick);
 
             foreach (Mobile mob in allMobiles)
             {
                 mob.onTick(currentTick);
             }
+
+            isLock = false;
         }
     }
 
 
 
-    private void TakeSnapshot()
+    private void TakeSnapshot(int tick)
     {
         // Create a dictionary to hold all entities' JSON data
         var snapshotData = new Dictionary<string, string>();
@@ -103,22 +113,106 @@ public class GameManager : MonoBehaviour
         string snapshotJson = JsonUtility.ToJson(new SerializableDictionary(snapshotData));
 
         // Add the snapshot JSON to the list
-        snapshots.Add(snapshotJson);
+        int index = tick % chunk_size;
+        /*Debug.Log($"index: {index}");*/
+        /*Debug.Log($"snapshots: {snapshots.Length}");*/
+        snapshots[index] = snapshotJson;
 
-        Debug.Log($"Snapshot taken: {snapshotJson}");
+        if ((currentTick + 1) % chunk_size == 0)
+        {
+            WriteSnapshotsToDisk();
+        }
+        /*Debug.Log($"Snapshot taken: {snapshotJson}");*/
     }
 
-    private void LoadSnapshot(int tickToLoad)
+    private void WriteSnapshotsToDisk()
     {
-        SerializableDictionary serialDict = JsonUtility.FromJson<SerializableDictionary>(snapshots[tickToLoad]);
+        var bigDict = new Dictionary<int, string>();
+        
+        // 保存的Chunk两端的tick序数
+        int startTick = currentTick + 1 - chunk_size;
+        int endTick = currentTick;
+        // 填充chunk字典
+        for (int i = startTick; i <= endTick; i++)
+        {
+            bigDict[i] = snapshots[i % chunk_size];
+        }
+
+        // 转为字符串格式并存储，此时无需清理snapshots，后续直接覆盖
+        string bigJson = JsonUtility.ToJson(new IntKeyedSerializableDictionary(bigDict));
+        string filePath = GetSnapshotFilePath(startTick, endTick);
+        File.WriteAllText(filePath, bigJson);
+        Debug.Log($"Wrote snapshots {startTick} to {endTick} to disk at {filePath}");
+    }
+
+    private bool LoadSnapshot()
+    {
+        if ((currentTick + 1) % chunk_size != 0) // 内存中
+        {
+            int index = currentTick % chunk_size;
+            string snapshotJson = snapshots[index];
+            ApplySnapshot(snapshotJson);
+            return true;
+        }
+        else
+        {
+            int index = currentTick % chunk_size;
+            int startTick = currentTick - index;
+            int endTick = currentTick;
+            string filePath = GetSnapshotFilePath(startTick, endTick);
+            if (!File.Exists(filePath))
+            {
+                Debug.LogWarning($"No snapshot file found for tick !");
+                return false;
+            }
+
+            string bigJson = File.ReadAllText(filePath);
+            IntKeyedSerializableDictionary fileDict = JsonUtility.FromJson<IntKeyedSerializableDictionary>(bigJson);
+            Dictionary<int, string> bigDict = fileDict.ToDictionary();
+            
+            bigDict.TryGetValue(currentTick, out string snapshotJson);
+            
+            ApplySnapshot(snapshotJson);
+
+            foreach (var kvp in bigDict)
+            {
+                int tick = kvp.Key;
+                string snapshot = kvp.Value;
+                int snapIndex = tick % chunk_size;
+                snapshots[snapIndex] = snapshot;
+            }
+
+            return true;
+        }
+    }
+
+
+    private string GetSnapshotFilePath(int startTick, int endTick)
+    {
+        string dir = Path.Combine(Application.persistentDataPath, "Snapshots");
+        if (!Directory.Exists(dir))
+        {
+            Directory.CreateDirectory(dir);
+        }
+        return Path.Combine(dir, $"snapshot_{startTick}_{endTick}.json");
+    }
+
+
+    private void ApplySnapshot(string snapshotJson)
+    {
+        SerializableDictionary serialDict = JsonUtility.FromJson<SerializableDictionary>(snapshotJson);
         Dictionary<string, string> dict = serialDict.ToDictionary();
 
         foreach (Mobile mob in allMobiles)
         {
-            mob.Load(dict[mob.name]);
+            if (dict.ContainsKey(mob.name))
+            {
+                mob.Load(dict[mob.name]);
+            }
         }
-
-        //Debug.Log("wow awesome");
-
+        /*Debug.Log("Snapshot applied.");*/
     }
+
+
+
 }
