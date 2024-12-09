@@ -3,78 +3,70 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
-    // Static instance to ensure global access
     public static GameManager Instance { get; private set; }
 
-
-    /* Global Variables -- 登记各种全局变量！ */
-
-
-
     public const int framePerTick = 30;
-
-
     public int currentTick = 0;
     public int currentTickTimeDelta = 0;
 
-    
     public int varFoo = 0;
     public string varBar = "Player";
     public Vector3Int varTestCoord = new Vector3Int(1, 3, 3);
 
-    /* 全图Savable寄存 */
-
     public List<string> snapshots = new List<string>();
     public Mobile[] allMobiles;
 
-
-    /* 确保唯一性 */
+    private const int snapshotInterval = 30;
 
     private void Awake()
     {
-        // Check if another instance already exists
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject); // Prevent duplicates
+            Destroy(gameObject);
             return;
         }
-
         Instance = this;
-        DontDestroyOnLoad(gameObject); // Persist between scenes
+        DontDestroyOnLoad(gameObject);
+
+        SnapshotManager.snapshotInterval = snapshotInterval; // 同步interval到SnapshotManager
 
         allMobiles = FindObjectsOfType<Mobile>();
+
+        // 设置FixedUpdate的调用频率为30Hz
+        Time.fixedDeltaTime = 1f / 30f;
     }
-
-
-
-    /* TEMPORARY: 输入检测不应该放在GameManager里面。仅限debug，之后会移除 */
-
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.R))
         {
-            LoadSnapshot(currentTick - 1);
-            currentTick--;
-            currentTickTimeDelta = 0;
+            int tickToLoad = currentTick - 1;
+            bool loaded = SnapshotManager.LoadSnapshot(
+                tickToLoad,
+                currentTick,
+                snapshots,
+                allMobiles,
+                snapshotInterval,
+                Application.persistentDataPath);
 
-        }
-        else if (Input.GetKeyDown(KeyCode.S))
-        {
-            //TakeSnapshot();
-
+            if (loaded)
+            {
+                currentTick = tickToLoad;
+                currentTickTimeDelta = 0;
+                if (snapshots.Count > 0)
+                {
+                    snapshots.RemoveAt(snapshots.Count - 1);
+                }
+            }
         }
     }
 
     private void FixedUpdate()
     {
-        /* time++； 如果到时间了就tick一次：更新所有东西  */
-
         currentTickTimeDelta++;
-        if ((currentTickTimeDelta+1) % framePerTick == 0)
+        if ((currentTickTimeDelta + 1) % framePerTick == 0)
         {
             currentTick++;
-            Debug.Log(currentTick);
             TakeSnapshot();
 
             foreach (Mobile mob in allMobiles)
@@ -84,41 +76,27 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
-
     private void TakeSnapshot()
     {
-        // Create a dictionary to hold all entities' JSON data
         var snapshotData = new Dictionary<string, string>();
-
-        // Iterate over all saveable entities
         foreach (var mob in allMobiles)
         {
-            // Serialize each entity's state
             string json = mob.Save();
-            snapshotData[mob.name] = json; // Use entity name as the key
+            snapshotData[mob.name] = json;
         }
 
-        // Convert the snapshot to a JSON string
         string snapshotJson = JsonUtility.ToJson(new SerializableDictionary(snapshotData));
-
-        // Add the snapshot JSON to the list
         snapshots.Add(snapshotJson);
 
-        Debug.Log($"Snapshot taken: {snapshotJson}");
-    }
-
-    private void LoadSnapshot(int tickToLoad)
-    {
-        SerializableDictionary serialDict = JsonUtility.FromJson<SerializableDictionary>(snapshots[tickToLoad]);
-        Dictionary<string, string> dict = serialDict.ToDictionary();
-
-        foreach (Mobile mob in allMobiles)
+        if (currentTick % snapshotInterval == 0)
         {
-            mob.Load(dict[mob.name]);
+            int startTick = currentTick - snapshotInterval + 1;
+            int endTick = currentTick;
+
+            SnapshotManager.WriteSnapshotsToDisk(snapshots, startTick, endTick, Application.persistentDataPath);
+
+            // 移除已写入硬盘的快照
+            snapshots.RemoveRange(0, snapshotInterval);
         }
-
-        //Debug.Log("wow awesome");
-
     }
 }
