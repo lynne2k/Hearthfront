@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     public List<string> snapshots = new List<string>();
     public Mobile[] allMobiles;
 
-    private const int snapshotInterval = 30;
+    private const int snapshotInterval = 5;
 
     private void Awake()
     {
@@ -64,10 +64,12 @@ public class GameManager : MonoBehaviour
     private void FixedUpdate()
     {
         currentTickTimeDelta++;
-        if ((currentTickTimeDelta + 1) % framePerTick == 0)
+        if ((currentTickTimeDelta) % framePerTick == 0)
         {
             currentTick++;
             TakeSnapshot();
+           
+            
 
             foreach (Mobile mob in allMobiles)
             {

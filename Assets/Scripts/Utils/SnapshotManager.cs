@@ -5,7 +5,7 @@ using System.IO;
 public static class SnapshotManager
 {
     // 这里的snapshotInterval需要从外部传入或者设置为静态全局变量
-    public static int snapshotInterval = 30;
+    public static int snapshotInterval = 5;
 
     // 写入多tick快照到硬盘
     public static void WriteSnapshotsToDisk(List<string> snapshots, int startTick, int endTick, string baseDir)
@@ -49,7 +49,7 @@ public static class SnapshotManager
         if (tickToLoad >= oldestInMemoryTick && tickToLoad <= currentTick)
         {
             // 内存中
-            int index = tickToLoad - oldestInMemoryTick;
+            int index = tickToLoad + 1 - oldestInMemoryTick;
             string snapshotJson = snapshots[index];
             ApplySnapshot(snapshotJson, allMobiles);
             return true;
@@ -57,9 +57,11 @@ public static class SnapshotManager
         else
         {
             // 文件中
-            int chunkIndex = (tickToLoad - 1) / snapshotInterval;
+            
+            int chunkIndex = (tickToLoad + 1) / snapshotInterval;
             int startTick = chunkIndex * snapshotInterval + 1;
             int endTick = startTick + snapshotInterval - 1;
+            Debug.Log($"chunkIndex:{chunkIndex} startTick:{startTick} endTick: {endTick}");
 
             string filePath = GetSnapshotFilePath(startTick, endTick, baseDir);
             if (!File.Exists(filePath))
