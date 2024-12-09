@@ -19,6 +19,11 @@ public class DemoSlime : Mobile
     // Start is called before obilethe first frame update
 
 
+
+    private Vector3 targetPositionBuffer;
+    private bool isMoving;
+
+
     public override string Save()
     {
         var positionInt = RoundVector3Int(transform.position);
@@ -44,6 +49,16 @@ public class DemoSlime : Mobile
 
     }
 
+    public override void onTick(int tick)
+    {
+        if (isMoving)
+        {
+            transform.position = targetPositionBuffer;
+            isMoving = false;
+        }
+        
+    }
+
 
     void Start()
     {
@@ -53,13 +68,15 @@ public class DemoSlime : Mobile
     // Update is called once per frame
     void Update()
     {
+
         if (Input.GetMouseButtonDown(0)) // Left mouse button
         {
             // Get the mouse position in world space
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             mousePosition.z = transform.position.z; // Keep the Z position the same for 2D
             mousePosition = RoundVector3(mousePosition);
-            transform.position = mousePosition;
+            targetPositionBuffer = mousePosition;
+            isMoving = true;
         }
     }
 
