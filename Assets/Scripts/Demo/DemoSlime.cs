@@ -61,14 +61,6 @@ public class DemoSlime : Mobile
             mousePosition = RoundVector3(mousePosition);
             transform.position = mousePosition;
         }
-        else if (Input.GetKeyDown(KeyCode.R)) 
-        {
-            LoadData();
-        }
-        else if (Input.GetKeyDown(KeyCode.S))
-        {
-            SaveData();
-        }
     }
 
 

@@ -19,6 +19,9 @@ public abstract class Mobile : MonoBehaviour, ISaveable
     public abstract void Load(string data);   // Force derived classes to implement
 
 
+    public Vector3Int gridPosition;
+
+
 
     public string latestData;
     public void SaveData()
