@@ -10,13 +10,10 @@ public class GameManager : MonoBehaviour
 
     /* Global Variables -- 登记各种全局变量！ */
 
-
-
     private const int framePerTick = 30;
 
-
-    private int currentTick = 0;
-    private int currentTickTimeDelta = 0;
+    protected int currentTick = 0;
+    protected int currentTickTimeDelta = 0;
 
     /* 全图Savable寄存 */
     private const int chunk_size = 5;
@@ -43,7 +40,9 @@ public class GameManager : MonoBehaviour
         allMobiles = FindObjectsOfType<Mobile>();
 
         // 初始时snapshot
-        /*Debug.Log($"tick: {currentTick}");*/
+
+        Ghost.Instance.Initialize();
+
         TakeSnapshot(currentTick);
 
     }
@@ -51,7 +50,6 @@ public class GameManager : MonoBehaviour
 
 
     /* TEMPORARY: 输入检测不应该放在GameManager里面。仅限debug，之后会移除 */
-
 
     private void Update()
     {
@@ -83,13 +81,13 @@ public class GameManager : MonoBehaviour
             isLock = true; // 设置读写锁
 
             currentTick++;
-            TakeSnapshot(currentTick);
-
+            
             foreach (Mobile mob in allMobiles)
             {
-                mob.onTick(currentTick);
+                mob.OnTick(currentTick);
             }
-
+            Ghost.Instance.OnTick();
+            TakeSnapshot(currentTick);
             isLock = false;
         }
     }
@@ -214,5 +212,21 @@ public class GameManager : MonoBehaviour
     }
 
 
+    /* ---------------------------- Util methods ---------------------------- */
+    public int GetCurrentTick()
+    {
+        return currentTick;
+    }
 
+    public Mobile FindMobileByCoordinate(Vector3Int gridPosition)
+    {
+        foreach (Mobile mob in allMobiles)
+        {
+            if (mob.gridPosition.x == gridPosition.x && mob.gridPosition.y == gridPosition.y)
+            {
+                return mob;
+            }
+        }
+        return null;
+    }
 }

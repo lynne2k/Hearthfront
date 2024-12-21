@@ -7,9 +7,11 @@ using UnityEngine;
 public class SlimeData
 {
     public string name;
+    public bool gh;
     public int x;
     public int y;
     public int z;
+    public int stamina;
 }
 
 
@@ -21,18 +23,31 @@ public class DemoSlime : Mobile
 
 
     private Vector3 targetPositionBuffer;
+    private Renderer objectRenderer;
     private bool isMoving;
+    private int stamina = 3;
+
+    void Start()
+    {
+        objectRenderer = gameObject.GetComponentInChildren<Renderer>();
+        if (objectRenderer != null)
+        {
+            Debug.Log("did I find?" + objectRenderer.gameObject.name);
+        }
+    }
+
 
 
     public override string Save()
     {
-        var positionInt = RoundVector3Int(transform.position);
         SlimeData data = new()
         {
             name = "slime",
-            x = positionInt.x,
-            y = positionInt.y,
-            z = positionInt.z
+            x = gridPosition.x,
+            y = gridPosition.y,
+            z = gridPosition.z,
+            gh = isPossessed,
+            stamina = stamina
         };
 
         return JsonUtility.ToJson(data);
@@ -41,35 +56,55 @@ public class DemoSlime : Mobile
     public override void Load(string loadedData)
     {
         SlimeData data = JsonUtility.FromJson<SlimeData>(loadedData);
+        gridPosition = new Vector3Int(
+            data.x, data.y, data.z
+        );
         transform.position = new Vector3(
             data.x,
             data.y,
             data.z
         );
+        isPossessed = data.gh;
+        stamina = data.stamina;
 
     }
 
-    public override void onTick(int tick)
+
+    public override void OnTick(int tick)
     {
         if (isMoving)
         {
             transform.position = targetPositionBuffer;
+            gridPosition = RoundVector3Int(transform.position);
             isMoving = false;
+            stamina -= 1;
         }
         
     }
-
-
-    void Start()
+    public override void OnPossess()
     {
-        
+        isPossessed = true;
+        if (objectRenderer != null)
+        {
+            objectRenderer.enabled = isPossessed;
+        }
+    }
+
+    public override void OnUnpossess()
+    {
+        isPossessed = false;
+        if (objectRenderer != null)
+        {
+            objectRenderer.enabled = isPossessed;
+        }
+
     }
 
     // Update is called once per frame
     void Update()
     {
 
-        if (Input.GetMouseButtonDown(0)) // Left mouse button
+        if (isPossessed && Input.GetMouseButtonDown(0) && !isMoving && stamina > 0) // Left mouse button
         {
             // Get the mouse position in world space
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
