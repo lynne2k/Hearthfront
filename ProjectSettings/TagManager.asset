@@ -14,13 +14,13 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Ground
+  - Solid
+  - Mobile
+  - Decoration
+  - Abyss
+  - Liquid
+  - Track
   - 
   - 
   - 

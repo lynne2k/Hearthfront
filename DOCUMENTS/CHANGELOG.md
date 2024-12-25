@@ -18,3 +18,12 @@
   - Animation script单方面地监视slime里面的参数，然后更新Animator里面的数值
   - Slime的主script不能直接调用/读取Animation script和Animator里面的东西（以防万一）
 - 已知bug：附身功能+时间回溯会产生矛盾（Ghost存储的附身对象不会随着时间回溯而更新）
+
+## 20241226T0053
+- 加入了一个Tilemap，设置了Physics layer
+- 把史莱姆的行动逻辑改成键盘操作了；只能动3次就会累死（动画上没有显示出来）
+  - TODO: 动画反映真实状态
+- 史莱姆的savedata加入了fx(facing_x)和fy(facing_y)，还没有用
+- 把Tick的顺序改回去了
+  - TODO: Tick和Snapshot的顺序待议。首先我们第0帧（游戏刚加载进去）就应该进行一次Snapshot的，现在是这么做的；然后过1秒后先Tick++再Snapshot，这样Snapshot的是第1帧。
+    - 问题是目前是反过来的，也就是说第0帧存了两次（#0和#1）。其实算bug，，，吧

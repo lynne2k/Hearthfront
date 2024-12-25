@@ -57,7 +57,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         //Ghost.Instance.Initiate(); # private
-        TakeSnapshot(currentTick);
+        TakeSnapshot(0);
     }
 
 
@@ -71,7 +71,7 @@ public class GameManager : MonoBehaviour
             isLock = true;
             if (currentTick >= 1)
             {
-                bool Loaded = LoadSnapshot();
+                bool Loaded = LoadSnapshot(currentTick - 1);
                 if (Loaded)
                 {
                     currentTick--;
@@ -105,18 +105,18 @@ public class GameManager : MonoBehaviour
 
 
         // Actual Ticking
-        if (isTickingThisFrame)
+        if (isTickingThisFrame && currentTick < 600)
         {
             isLock = true; // 设置读写锁
 
             currentTick++;
 
+            TakeSnapshot(currentTick);
             foreach (Mobile mob in allMobiles)
             {
                 mob.OnTick(currentTick);
             }
             Ghost.Instance.OnTick();
-            TakeSnapshot(currentTick);
             isLock = false;
         }
 
@@ -172,8 +172,9 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Wrote snapshots {startTick} to {endTick} to disk at {filePath}");
     }
 
-    private bool LoadSnapshot()
+    private bool LoadSnapshot(int tickToLoad)
     {
+        /* !!!!!!!!!!!!!!! tickToLoad!!! */
         if ((currentTick + 1) % chunk_size != 0) // 内存中
         {
             int index = currentTick % chunk_size;

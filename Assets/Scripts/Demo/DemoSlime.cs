@@ -12,6 +12,8 @@ public class SlimeData
     public int y;
     public int z;
     public int stamina;
+    public int fx;
+    public int fy;
 }
 
 
@@ -22,10 +24,18 @@ public class DemoSlime : Mobile
 
 
 
-    private Vector3 targetPositionBuffer;
+    private Vector3Int targetPositionBuffer;
     private Renderer objectRenderer;
     private bool isMoving;
     private int stamina = 3;
+    private int facingX = 1;
+    private int facingY = 1;
+
+
+
+
+    public LayerMask solidLayer;
+
 
     void Start()
     {
@@ -47,7 +57,9 @@ public class DemoSlime : Mobile
             y = gridPosition.y,
             z = gridPosition.z,
             gh = isPossessed,
-            stamina = stamina
+            stamina = stamina,
+            fx = facingX,
+            fy = facingY
         };
 
         return JsonUtility.ToJson(data);
@@ -66,6 +78,8 @@ public class DemoSlime : Mobile
         );
         isPossessed = data.gh;
         stamina = data.stamina;
+        facingX = data.fx;
+        facingY = data.fy;
 
     }
 
@@ -75,7 +89,7 @@ public class DemoSlime : Mobile
         if (isMoving)
         {
             transform.position = targetPositionBuffer;
-            gridPosition = RoundVector3Int(transform.position);
+            gridPosition = targetPositionBuffer;  // RoundVector3Int(transform.position);
             isMoving = false;
             stamina -= 1;
         }
@@ -95,15 +109,50 @@ public class DemoSlime : Mobile
     void Update()
     {
 
-        if (isPossessed && Input.GetMouseButtonDown(0) && !isMoving && stamina > 0) // Left mouse button
+        //if (isPossessed && Input.GetMouseButtonDown(0) && !isMoving && stamina > 0) // Left mouse button
+        //{
+        //    // Get the mouse position in world space
+        //    Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        //    mousePosition.z = transform.position.z; // Keep the Z position the same for 2D
+        //    mousePosition = RoundVector3(mousePosition);
+        //    targetPositionBuffer = mousePosition;
+        //    isMoving = true;
+        //}
+        if (isPossessed && !isMoving && stamina > 0)
         {
-            // Get the mouse position in world space
-            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            mousePosition.z = transform.position.z; // Keep the Z position the same for 2D
-            mousePosition = RoundVector3(mousePosition);
-            targetPositionBuffer = mousePosition;
-            isMoving = true;
+            if (Input.GetKeyDown(KeyCode.D) && TestMove(new Vector3Int(1, 0, 0)))
+            {
+                isMoving = true;
+                targetPositionBuffer = gridPosition + new Vector3Int(1, 0, 0);
+                Debug.Log(targetPositionBuffer.ToString());
+            }
+            else if (Input.GetKeyDown(KeyCode.A) && TestMove(new Vector3Int(-1, 0, 0)))
+            {
+                isMoving = true;
+                targetPositionBuffer = gridPosition + new Vector3Int(-1, 0, 0);
+                Debug.Log(targetPositionBuffer.ToString());
+            }
+            else if (Input.GetKeyDown(KeyCode.W) && TestMove(new Vector3Int(0, 1, 0)))
+            {
+                isMoving = true;
+                targetPositionBuffer = gridPosition + new Vector3Int(0, 1, 0);
+                Debug.Log(targetPositionBuffer.ToString());
+            }
+            else if (Input.GetKeyDown(KeyCode.S) && TestMove(new Vector3Int(0, -1, 0)))
+            {
+                isMoving = true;
+                targetPositionBuffer = gridPosition + new Vector3Int(0, -1, 0);
+                Debug.Log(targetPositionBuffer.ToString());
+            }
         }
+    }
+
+
+    private bool TestMove(Vector3Int vec)
+    {
+        if (Physics2D.OverlapArea(gridPosition + vec - new Vector3(0.2f, 0.2f, 0), gridPosition + new Vector3Int(1, 0, 0) + new Vector3(0.2f, 0.2f, 0), solidLayer))
+            return false;
+        return true;
     }
 
 
