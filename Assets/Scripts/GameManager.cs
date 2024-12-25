@@ -2,6 +2,12 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
 
+
+public enum TimeMode
+{
+    AUTO, MANUAL
+}
+
 public class GameManager : MonoBehaviour
 {
     // Static instance to ensure global access
@@ -14,11 +20,14 @@ public class GameManager : MonoBehaviour
 
     protected int currentTick = 0;
     protected int currentTickTimeDelta = 0;
+    protected float timePassedSinceLastTick = 0;
 
     /* 全图Savable寄存 */
     private const int chunk_size = 5;
     private string[] snapshots = new string[chunk_size];
     public bool isLock = false;
+
+    public TimeMode timeflowOption = TimeMode.AUTO;
 
     public Mobile[] allMobiles;
 
@@ -38,13 +47,17 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject); // Persist between scenes
 
         allMobiles = FindObjectsOfType<Mobile>();
-
+         
         // 初始时snapshot
 
-        Ghost.Instance.Initialize();
+        
 
+    }
+
+    private void Start()
+    {
+        //Ghost.Instance.Initiate(); # private
         TakeSnapshot(currentTick);
-
     }
 
 
@@ -62,26 +75,42 @@ public class GameManager : MonoBehaviour
                 if (Loaded)
                 {
                     currentTick--;
-                    currentTickTimeDelta = 0;
+                    //currentTickTimeDelta = 0;
+                    timePassedSinceLastTick = 0f;
                 }
             }
             isLock = false;
             /*Debug.Log($"currentTick: {currentTick}");*/
         }
-        
-    }
+        else if (Input.GetKeyDown(KeyCode.Space))
+        {
+            timeflowOption = timeflowOption == TimeMode.AUTO ? TimeMode.MANUAL : TimeMode.AUTO;
+        }
 
-    private void FixedUpdate()
-    {
-        /*time++； 如果到时间了就tick一次：更新所有东西*/
 
-       currentTickTimeDelta++;
-        if ((currentTickTimeDelta + 1) % framePerTick == 0)
+        /* Ticking */
+        bool isTickingThisFrame = false;
+
+        timePassedSinceLastTick += Time.deltaTime;
+        if (timeflowOption == TimeMode.AUTO && timePassedSinceLastTick >= 1f)    // Using absolute time, instead of frames...
+        {
+            isTickingThisFrame = true;
+            timePassedSinceLastTick = 0f;
+        }
+        else if (timeflowOption == TimeMode.MANUAL && Input.GetKeyDown(KeyCode.P))
+        {
+            isTickingThisFrame = true;
+            timePassedSinceLastTick = 0f;
+        }
+
+
+        // Actual Ticking
+        if (isTickingThisFrame)
         {
             isLock = true; // 设置读写锁
 
             currentTick++;
-            
+
             foreach (Mobile mob in allMobiles)
             {
                 mob.OnTick(currentTick);
@@ -90,8 +119,8 @@ public class GameManager : MonoBehaviour
             TakeSnapshot(currentTick);
             isLock = false;
         }
-    }
 
+    }
 
 
     private void TakeSnapshot(int tick)

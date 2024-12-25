@@ -84,20 +84,11 @@ public class DemoSlime : Mobile
     public override void OnPossess()
     {
         isPossessed = true;
-        if (objectRenderer != null)
-        {
-            objectRenderer.enabled = isPossessed;
-        }
     }
 
     public override void OnUnpossess()
     {
         isPossessed = false;
-        if (objectRenderer != null)
-        {
-            objectRenderer.enabled = isPossessed;
-        }
-
     }
 
     // Update is called once per frame

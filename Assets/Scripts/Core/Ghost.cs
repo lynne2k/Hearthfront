@@ -19,6 +19,7 @@ public class Ghost : MonoBehaviour
             return;
         }
         Instance = this;
+        Initialize();
 
     }
 
@@ -52,7 +53,7 @@ public class Ghost : MonoBehaviour
         }
     }
 
-    public void Initialize()
+    private void Initialize()
     {
         defaultPossesser.OnPossess();
         currentPossessor = defaultPossesser;
