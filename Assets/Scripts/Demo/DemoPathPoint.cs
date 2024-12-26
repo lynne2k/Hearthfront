@@ -39,7 +39,7 @@ public class DemoPathPoint : Mobile
             data.y,
             data.z
         );
-        isPossessed = data.gh;
+        //isPossessed = data.gh;
 
     }
 
@@ -55,13 +55,19 @@ public class DemoPathPoint : Mobile
 
     public override void OnPossess()
     {
+        isPossessed = true;
     }
 
     public override void OnUnpossess()
     {
+        isPossessed = false;
     }
 
 
+    private void Start()
+    {
+        gridPosition = GameUtils.RoundVector3Int(transform.position);
+    }
 
 
 

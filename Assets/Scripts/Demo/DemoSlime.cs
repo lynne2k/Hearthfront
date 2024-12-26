@@ -76,7 +76,7 @@ public class DemoSlime : Mobile
             data.y,
             data.z
         );
-        isPossessed = data.gh;
+        //isPossessed = data.gh;
         stamina = data.stamina;
         facingX = data.fx;
         facingY = data.fy;
@@ -150,7 +150,7 @@ public class DemoSlime : Mobile
 
     private bool TestMove(Vector3Int vec)
     {
-        if (Physics2D.OverlapArea(gridPosition + vec - new Vector3(0.2f, 0.2f, 0), gridPosition + new Vector3Int(1, 0, 0) + new Vector3(0.2f, 0.2f, 0), solidLayer))
+        if (Physics2D.OverlapArea(gridPosition + vec - new Vector3(0.2f, 0.2f, 0), gridPosition + vec + new Vector3(0.2f, 0.2f, 0), solidLayer))
             return false;
         return true;
     }

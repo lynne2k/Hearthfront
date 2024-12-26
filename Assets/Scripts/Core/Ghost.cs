@@ -11,6 +11,11 @@ public class Ghost : MonoBehaviour
     public bool isSwapping;
     public Mobile swapTarget = null;
 
+
+
+    public Camera camera = null;
+
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -38,6 +43,16 @@ public class Ghost : MonoBehaviour
                 isSwapping = true;
             }
         }
+    }
+
+
+    private void LateUpdate()
+    {
+        /*    Camera Movement   */
+        transform.position = currentPossessor.transform.position;
+        Vector3 targetPosition = new Vector3(transform.position.x, transform.position.y, camera.transform.position.z);
+        Vector3 smoothedPosition = Vector3.Lerp(camera.transform.position, targetPosition, 0.05f);
+        camera.transform.position = smoothedPosition;
     }
 
     public void OnTick()
