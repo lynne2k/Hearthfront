@@ -4,18 +4,17 @@ using UnityEngine;
 
 
 [System.Serializable]
-public class PathPointData
+
+public class TeleportEndPoint : Mobile
 {
-    public string name;
-    public bool gh;
-}
+
+    public TeleportEndPoint OtherEndpoint;
 
 
-public class DemoPathPoint : Mobile
-{
+
     public override string Save()
     {
-        var positionInt = RoundVector3Int(transform.position);
+        //var positionInt = GameUtils.RoundVector3Int(transform.position);
         PathPointData data = new()
         {
             name = gameObject.name,
@@ -27,7 +26,7 @@ public class DemoPathPoint : Mobile
 
     public override void Load(string loadedData)
     {
-        PathPointData data = JsonUtility.FromJson<PathPointData>(loadedData);
+        //PathPointData data = JsonUtility.FromJson<PathPointData>(loadedData);
         //isPossessed = data.gh;
 
     }
@@ -35,6 +34,11 @@ public class DemoPathPoint : Mobile
     private void Update()
     {
         gridPosition = GameUtils.RoundVector3Int(transform.position);
+        if (isPossessed && Input.GetKeyDown(KeyCode.E))
+        {
+            bool success = Ghost.Instance.CallSwap(OtherEndpoint);
+            //Debug.Log(gameObject.name + " trying to teleport to " + OtherEndpoint.name + "with succ:" + success.ToString());
+        }
     }
 
     public override void OnTick(int tick)
@@ -45,6 +49,7 @@ public class DemoPathPoint : Mobile
     public override void OnPossess()
     {
         isPossessed = true;
+
     }
 
     public override void OnUnpossess()
@@ -56,34 +61,5 @@ public class DemoPathPoint : Mobile
     private void Start()
     {
         gridPosition = GameUtils.RoundVector3Int(transform.position);
-    }
-
-
-
-
-
-
-
-
-
-
-    // ------------------------------------------------------
-    private Vector3 RoundVector3(Vector3 vector)
-    {
-        return new Vector3(
-            Mathf.Round(vector.x),
-            Mathf.Round(vector.y),
-            Mathf.Round(vector.z)
-        );
-    }
-
-    private Vector3Int RoundVector3Int(Vector3 vector)
-    {
-        var roundedVector = RoundVector3(vector);
-        return new Vector3Int(
-            (int)roundedVector.x,
-            (int)roundedVector.y,
-            (int)roundedVector.z
-        );
     }
 }

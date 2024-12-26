@@ -31,3 +31,9 @@
 ## 20241226T1445
 - 附身+小动画
   - 1502: 加入了附身距离
+  - 后续参考文献（camera设置pixel perfect）：https://docs.unity3d.com/Packages/com.unity.2d.pixel-perfect@1.0/manual/index.html
+
+## 20241226T1622
+- 附身优化（了吗？）
+- 加入传送端点
+- 修复了PathPoint用SlimeData的bug，删除了用不着的字段

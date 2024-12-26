@@ -79,4 +79,15 @@ public class Ghost : MonoBehaviour
         defaultPossesser.OnPossess();
         currentPossessor = defaultPossesser;
     }
+
+    public bool CallSwap(Mobile targetMob)
+    {
+        if (!isSwapping && targetMob != null)
+        {
+            swapTarget = targetMob;
+            isSwapping = true;
+            return true;
+        }
+        return false;
+    }
 }
