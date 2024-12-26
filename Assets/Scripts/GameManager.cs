@@ -10,7 +10,6 @@ public enum TimeMode
 
 public class GameManager : MonoBehaviour
 {
-    // Static instance to ensure global access
     public static GameManager Instance { get; private set; }
 
 
@@ -31,20 +30,19 @@ public class GameManager : MonoBehaviour
 
     public Mobile[] allMobiles;
 
-
-    /* 确保唯一性 */
+    private const int snapshotInterval = 5;
 
     private void Awake()
     {
-        // Check if another instance already exists
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject); // Prevent duplicates
+            Destroy(gameObject);
             return;
         }
-
         Instance = this;
-        DontDestroyOnLoad(gameObject); // Persist between scenes
+        DontDestroyOnLoad(gameObject);
+
+        SnapshotManager.snapshotInterval = snapshotInterval; // 同步interval到SnapshotManager
 
         allMobiles = FindObjectsOfType<Mobile>();
          
@@ -125,18 +123,13 @@ public class GameManager : MonoBehaviour
 
     private void TakeSnapshot(int tick)
     {
-        // Create a dictionary to hold all entities' JSON data
         var snapshotData = new Dictionary<string, string>();
-
-        // Iterate over all saveable entities
         foreach (var mob in allMobiles)
         {
-            // Serialize each entity's state
             string json = mob.Save();
-            snapshotData[mob.name] = json; // Use entity name as the key
+            snapshotData[mob.name] = json;
         }
 
-        // Convert the snapshot to a JSON string
         string snapshotJson = JsonUtility.ToJson(new SerializableDictionary(snapshotData));
 
         // Add the snapshot JSON to the list
