@@ -13,7 +13,7 @@ public class Ghost : MonoBehaviour
 
 
 
-    public Camera camera = null;
+    public Camera mainCamera = null;
 
 
     private void Awake()
@@ -35,13 +35,19 @@ public class Ghost : MonoBehaviour
             // get the game object it is trying to swap to
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3Int mouseGridPosition = GameUtils.RoundVector3Int(mousePosition);
-            Debug.Log("Trying to set Ghost to " + mouseGridPosition.ToString());
-            Mobile targetMob = GameManager.Instance.FindMobileByCoordinate(mouseGridPosition);
-            if (targetMob != null)
+            mouseGridPosition.z = 0;
+
+            //Debug.Log("Trying to set Ghost to " + mouseGridPosition.ToString() + ", dist: " + Vector3Int.Distance(mouseGridPosition, currentPossessor.gridPosition).ToString());
+            if (Vector3Int.Distance(mouseGridPosition, currentPossessor.gridPosition) < 3.58f)
             {
-                swapTarget = targetMob;
-                isSwapping = true;
+                Mobile targetMob = GameManager.Instance.FindMobileByCoordinate(mouseGridPosition);
+                if (targetMob != null)
+                {
+                    swapTarget = targetMob;
+                    isSwapping = true;
+                }
             }
+            
         }
     }
 
@@ -50,9 +56,9 @@ public class Ghost : MonoBehaviour
     {
         /*    Camera Movement   */
         transform.position = currentPossessor.transform.position;
-        Vector3 targetPosition = new Vector3(transform.position.x, transform.position.y, camera.transform.position.z);
-        Vector3 smoothedPosition = Vector3.Lerp(camera.transform.position, targetPosition, 0.05f);
-        camera.transform.position = smoothedPosition;
+        Vector3 targetPosition = new Vector3(transform.position.x, transform.position.y, mainCamera.transform.position.z);
+        Vector3 smoothedPosition = Vector3.Lerp(mainCamera.transform.position, targetPosition, 0.05f);
+        mainCamera.transform.position = smoothedPosition;
     }
 
     public void OnTick()

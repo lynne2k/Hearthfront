@@ -454,7 +454,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.8, y: 0.8}
   m_EdgeRadius: 0
 --- !u!1 &362822861
 GameObject:
@@ -1461,6 +1461,7 @@ MonoBehaviour:
   currentPossessor: {fileID: 1967115909}
   isSwapping: 0
   swapTarget: {fileID: 0}
+  mainCamera: {fileID: 16715077}
 --- !u!4 &1761788397
 Transform:
   m_ObjectHideFlags: 0
@@ -1470,7 +1471,7 @@ Transform:
   m_GameObject: {fileID: 1761788395}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.6036294, y: 1.388773, z: -0.04041029}
+  m_LocalPosition: {x: 0, y: 0, z: 10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
