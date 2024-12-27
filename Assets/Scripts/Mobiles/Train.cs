@@ -83,6 +83,7 @@ public class DemoTrain : Mobile
             {
                 MoveBackward();
             }
+            gridPosition = GameUtils.RoundVector3Int(transform.position);
         }
         else
         {
