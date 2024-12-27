@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public abstract class Mobile : MonoBehaviour, ISaveable
 {
@@ -25,6 +26,9 @@ public abstract class Mobile : MonoBehaviour, ISaveable
     public Vector3Int gridPosition;
     public bool isPossessed = false;
     public bool isAlive = true;
+
+    [TextArea]
+    public List<string> spells;
 
     public string latestData;
     public void SaveData()

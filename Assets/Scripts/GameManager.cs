@@ -5,7 +5,7 @@ using System.IO;
 
 public enum TimeMode
 {
-    AUTO, MANUAL
+    AUTO, MANUAL, PAUSED
 }
 
 public class GameManager : MonoBehaviour

@@ -24,4 +24,21 @@ public static class GameUtils
             (int) roundedVector.z
         );
     }
+
+    public static Vector2 CubicBezierVector2(float t, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
+    {
+        float u = 1 - t;
+        float tt = t * t;
+        float uu = u * u;
+        float uuu = uu * u;
+        float ttt = tt * t;
+
+        // Perform cubic interpolation
+        Vector2 p = uuu * p0; // (1 - t)^3 * P0
+        p += 3 * uu * t * p1; // 3 * (1 - t)^2 * t * P1
+        p += 3 * u * tt * p2; // 3 * (1 - t) * t^2 * P2
+        p += ttt * p3;         // t^3 * P3
+
+        return p;
+    }
 }
