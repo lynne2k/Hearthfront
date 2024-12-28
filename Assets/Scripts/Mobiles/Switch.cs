@@ -2,17 +2,19 @@ using UnityEngine;
 
 public class Switch : MonoBehaviour
 {
-    public Door door;  // Óë¿ª¹Ø°ó¶¨µÄÃÅ
-    public LayerMask triggerLayer;  // ´¥·¢¿ª¹ØµÄÎïÌå²ã
-    private SpriteRenderer switchRenderer;  // ÓÃÓÚÏÔÊ¾¿ª¹ØµÄ¾«Áé
+    public Door door;  // ä¸å¼€å…³ç»‘å®šçš„é—¨
+    public LayerMask triggerLayer;  // è§¦å‘å¼€å…³çš„ç‰©ä½“å±‚
+    private SpriteRenderer switchRenderer;  // ç”¨äºæ˜¾ç¤ºå¼€å…³çš„ç²¾çµ
 
-    // ¹«¹²±äÁ¿£¬ÓÃÓÚÔÚ±à¼­Æ÷ÖĞ°ó¶¨Á½¸ö²»Í¬×´Ì¬µÄSprite
-    public Sprite activatedSwitchSprite;  // ¼¤»î×´Ì¬£¨¿ª£©
-    public Sprite deactivatedSwitchSprite;  // Î´¼¤»î×´Ì¬£¨¹Ø£©
+    // å…¬å…±å˜é‡ï¼Œç”¨äºåœ¨ç¼–è¾‘å™¨ä¸­ç»‘å®šä¸¤ä¸ªä¸åŒçŠ¶æ€çš„Sprite
+    public Sprite activatedSwitchSprite;  // æ¿€æ´»çŠ¶æ€ï¼ˆå¼€ï¼‰
+    public Sprite deactivatedSwitchSprite;  // æœªæ¿€æ´»çŠ¶æ€ï¼ˆå…³ï¼‰
+
+    public bool isPressed = false;
 
     private void Start()
     {
-        // »ñÈ¡SpriteRenderer×é¼ş£¬È·±£¿ª¹ØÓĞSpriteRenderer
+        // è·å–SpriteRendererç»„ä»¶ï¼Œç¡®ä¿å¼€å…³æœ‰SpriteRenderer
         switchRenderer = GetComponent<SpriteRenderer>();
         if (switchRenderer == null)
         {
@@ -20,32 +22,20 @@ public class Switch : MonoBehaviour
             return;
         }
 
-        // ³õÊ¼Ê±ÉèÖÃ¿ª¹ØµÄ×´Ì¬
-        switchRenderer.sprite = deactivatedSwitchSprite;  // Ä¬ÈÏÊÇÎ´¼¤»î×´Ì¬
+        // åˆå§‹æ—¶è®¾ç½®å¼€å…³çš„çŠ¶æ€
+        switchRenderer.sprite = deactivatedSwitchSprite;  // é»˜è®¤æ˜¯æœªæ¿€æ´»çŠ¶æ€
     }
 
     private void Update()
     {
-        // ¼ì²âµ±Ç°Î»ÖÃÊÇ·ñÓĞÎïÌå£¬Èç¹ûÓĞÎïÌåÔÚ¿ª¹ØÎ»ÖÃ£¬´ò¿ªÃÅ£¬²¢¼¤»î¿ª¹Ø
-        if (IsObjectOnSwitch())
-        {
-            door.OpenDoor();  // ´ò¿ªÃÅ
-            switchRenderer.sprite = activatedSwitchSprite;  // ¼¤»î¿ª¹Ø
-        }
-        else
-        {
-            door.CloseDoor();  // ¹Ø±ÕÃÅ
-            switchRenderer.sprite = deactivatedSwitchSprite;  // ¹Ø±Õ¿ª¹Ø
-        }
+        isPressed = IsObjectOnSwitch();
     }
 
-    // ¼ì²éÊÇ·ñÓĞÎïÌåÔÚ¿ª¹ØÎ»ÖÃ
+    // æ£€æŸ¥æ˜¯å¦æœ‰ç‰©ä½“åœ¨å¼€å…³ä½ç½®
     private bool IsObjectOnSwitch()
     {
-        // Ê¹ÓÃ OverlapCircle »òÕß OverlapBox ÅĞ¶ÏÊÇ·ñÓĞÎïÌåÔÚ¿ª¹ØµÄ´¥·¢ÇøÓòÄÚ
-        // ÕâÀïÓÃµÄÊÇ `OverlapCircle`£¬¼ì²é¿ª¹ØÖÜÎ§Ò»¶¨·¶Î§ÄÚµÄÎïÌå
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.5f, triggerLayer);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.3f, triggerLayer);
 
-        return colliders.Length > 0;  // Èç¹û¼ì²âµ½ÈÎºÎÎïÌå£¬Ôò·µ»Ø true
+        return colliders.Length > 0;
     }
 }

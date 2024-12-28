@@ -659,6 +659,7 @@ MonoBehaviour:
     m_Bits: 3072
   activatedSwitchSprite: {fileID: -2932148819362167754, guid: 869e088ab1c5ce74e9d900bbb44cb690, type: 3}
   deactivatedSwitchSprite: {fileID: 256995916288710407, guid: 227553c7aea48e740ba4e1d6e75df83e, type: 3}
+  isPressed: 0
 --- !u!212 &348186308
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1785,6 +1786,7 @@ MonoBehaviour:
   isPossessed: 0
   isAlive: 1
   spells: []
+  acceptingSpellPrefixes: []
   latestData: 
   OtherEndpoint: {fileID: 1502996230}
 --- !u!4 &1569592438
@@ -2034,6 +2036,8 @@ MonoBehaviour:
   isOpen: 0
   openDoorSprite: {fileID: 3324166953396482562, guid: aed51c5d776f0f64a8e95e72fcf5e934, type: 3}
   closedDoorSprite: {fileID: 7205210543183354201, guid: a6eef23dd494e0a468a915bfd11d1fd1, type: 3}
+  switches:
+  - {fileID: 348186307}
 --- !u!212 &1692128585
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2225,6 +2229,7 @@ MonoBehaviour:
   currentPossessor: {fileID: 1967115909}
   isSwapping: 0
   swapTarget: {fileID: 0}
+  collectedSpells: []
   mainCamera: {fileID: 16715077}
 --- !u!4 &1761788397
 Transform:
@@ -2291,7 +2296,10 @@ MonoBehaviour:
   isPossessed: 0
   isAlive: 1
   spells: []
+  acceptingSpellPrefixes: []
   latestData: 
+  initialStamina: 3
+  stamina: 3
   solidLayer:
     serializedVersion: 2
     m_Bits: 1024
@@ -2470,6 +2478,7 @@ MonoBehaviour:
   isPossessed: 0
   isAlive: 1
   spells: []
+  acceptingSpellPrefixes: []
   latestData: 
   track: {fileID: 1533539626}
   activatedSprite: {fileID: -8392041498895554869, guid: da9f6a2ae77e47d418fb1263f598245f, type: 3}

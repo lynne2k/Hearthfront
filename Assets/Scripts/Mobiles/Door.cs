@@ -2,19 +2,21 @@ using UnityEngine;
 
 public class Door : MonoBehaviour
 {
-    public bool isOpen = false;  // ÃÅÊÇ·ñ¿ªÆô
-    private SpriteRenderer doorRenderer; // ÓÃÓÚÏÔÊ¾ÃÅµÄ¾«Áé
-    private Collider2D doorCollider;  // ÃÅµÄÅö×²Æ÷
+    public bool isOpen = false;  // é—¨æ˜¯å¦å¼€å¯
+    private SpriteRenderer doorRenderer; // ç”¨äºæ˜¾ç¤ºé—¨çš„ç²¾çµ
+    private Collider2D doorCollider;  // é—¨çš„ç¢°æ’å™¨
 
-    // ¹«¹²±äÁ¿£¬ÓÃÓÚÔÚ±à¼­Æ÷ÖĞ°ó¶¨Á½¸ö²»Í¬×´Ì¬µÄSprite
+    // å…¬å…±å˜é‡ï¼Œç”¨äºåœ¨ç¼–è¾‘å™¨ä¸­ç»‘å®šä¸¤ä¸ªä¸åŒçŠ¶æ€çš„Sprite
     public Sprite openDoorSprite;
     public Sprite closedDoorSprite;
 
+    public Switch[] switches;
+
     private void Start()
     {
-        // »ñÈ¡SpriteRenderer×é¼ş£¬È·±£ÃÅÓĞSpriteRenderer
+        // è·å–SpriteRendererç»„ä»¶ï¼Œç¡®ä¿é—¨æœ‰SpriteRenderer
         doorRenderer = GetComponent<SpriteRenderer>();
-        doorCollider = GetComponent<Collider2D>();  // »ñÈ¡ÃÅµÄÅö×²Æ÷×é¼ş
+        doorCollider = GetComponent<Collider2D>();  // è·å–é—¨çš„ç¢°æ’å™¨ç»„ä»¶
 
         if (doorRenderer == null)
         {
@@ -26,39 +28,56 @@ public class Door : MonoBehaviour
             Debug.LogError("Collider2D not found on Door object. Please add a Collider2D.");
         }
 
-        // ³õÊ¼Ê±ÉèÖÃÃÅµÄ×´Ì¬
+        // åˆå§‹æ—¶è®¾ç½®é—¨çš„çŠ¶æ€
         if (isOpen)
         {
             doorRenderer.sprite = openDoorSprite;
-            doorCollider.enabled = false;  // ¿ªÃÅÊ±½ûÓÃÅö×²Æ÷
+            doorCollider.enabled = false;  // å¼€é—¨æ—¶ç¦ç”¨ç¢°æ’å™¨
         }
         else
         {
             doorRenderer.sprite = closedDoorSprite;
-            doorCollider.enabled = true;   // ¹ØÃÅÊ±ÆôÓÃÅö×²Æ÷
+            doorCollider.enabled = true;   // å…³é—¨æ—¶å¯ç”¨ç¢°æ’å™¨
         }
     }
 
-    // ´ò¿ªÃÅ
-    public void OpenDoor()
+    private void Update()
+    {
+        bool isAllButtonPressed = true;
+        foreach (var sw in switches)
+        {
+            if (!sw.isPressed) isAllButtonPressed = false;
+        }
+        if (isAllButtonPressed && !isOpen)
+        {
+            OpenDoor();
+        }
+        else if (!isAllButtonPressed && isOpen)
+        {
+            CloseDoor();
+        }
+    }
+
+
+
+    private void OpenDoor()
     {
         if (!isOpen)
         {
             isOpen = true;
-            doorRenderer.sprite = openDoorSprite;  // ÉèÖÃÃÅÎª´ò¿ª×´Ì¬µÄ¾«Áé
-            doorCollider.enabled = false;  // ½ûÓÃÅö×²Æ÷
+            doorRenderer.sprite = openDoorSprite;  // è®¾ç½®é—¨ä¸ºæ‰“å¼€çŠ¶æ€çš„ç²¾çµ
+            doorCollider.enabled = false;  // ç¦ç”¨ç¢°æ’å™¨
             Debug.Log("Door opened");
         }
     }
 
-    // ¹Ø±ÕÃÅ
-    public void CloseDoor()
+    private void CloseDoor()
     {
         if (isOpen)
         {
             isOpen = false;
-            doorRenderer.sprite = closedDoorSprite;  // ÉèÖÃÃÅÎª¹Ø±Õ×´Ì¬µÄ¾«Áé
-            doorCollider.enabled = true;   // ÆôÓÃÅö×²Æ÷
+            doorRenderer.sprite = closedDoorSprite;  // è®¾ç½®é—¨ä¸ºå…³é—­çŠ¶æ€çš„ç²¾çµ
+            doorCollider.enabled = true;   // å¯ç”¨ç¢°æ’å™¨
             Debug.Log("Door closed");
         }
     }

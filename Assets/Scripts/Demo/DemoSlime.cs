@@ -127,26 +127,32 @@ public class DemoSlime : Mobile
             {
                 isMoving = true;
                 targetPositionBuffer = gridPosition + new Vector3Int(1, 0, 0);
+                GameManager.Instance.NotifyMobileUpdate();
                 Debug.Log(targetPositionBuffer.ToString());
             }
             else if (Input.GetKeyDown(KeyCode.A) && TestMove(new Vector3Int(-1, 0, 0)))
             {
                 isMoving = true;
                 targetPositionBuffer = gridPosition + new Vector3Int(-1, 0, 0);
+                GameManager.Instance.NotifyMobileUpdate();
                 Debug.Log(targetPositionBuffer.ToString());
             }
             else if (Input.GetKeyDown(KeyCode.W) && TestMove(new Vector3Int(0, 1, 0)))
             {
                 isMoving = true;
                 targetPositionBuffer = gridPosition + new Vector3Int(0, 1, 0);
+                GameManager.Instance.NotifyMobileUpdate();
                 Debug.Log(targetPositionBuffer.ToString());
             }
             else if (Input.GetKeyDown(KeyCode.S) && TestMove(new Vector3Int(0, -1, 0)))
             {
                 isMoving = true;
                 targetPositionBuffer = gridPosition + new Vector3Int(0, -1, 0);
+                GameManager.Instance.NotifyMobileUpdate();
                 Debug.Log(targetPositionBuffer.ToString());
             }
+            
+
         }
     }
 

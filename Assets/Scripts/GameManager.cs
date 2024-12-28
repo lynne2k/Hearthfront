@@ -101,6 +101,12 @@ public class GameManager : MonoBehaviour
             isTickingThisFrame = true;
             timePassedSinceLastTick = 0f;
         }
+        else if (timeflowOption == TimeMode.MANUAL && canGoToNextTick)
+        {
+            isTickingThisFrame = true;
+            canGoToNextTick = false;
+            timePassedSinceLastTick = 0f;
+        }
 
         // Actual Ticking
         if (isTickingThisFrame && currentTick < 600)
@@ -298,5 +304,13 @@ public class GameManager : MonoBehaviour
             }
         }
         return null;
+    }
+
+
+    private bool canGoToNextTick = false;
+
+    public void NotifyMobileUpdate()
+    {
+        canGoToNextTick = true;
     }
 }
