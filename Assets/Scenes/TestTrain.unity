@@ -2605,7 +2605,8 @@ MonoBehaviour:
   playerControllable: 0
   positiveSwitches:
   - {fileID: 1553426187}
-  negativeSwitches: []
+  negativeSwitches:
+  - {fileID: 348186307}
   activatedSprite: {fileID: -8392041498895554869, guid: da9f6a2ae77e47d418fb1263f598245f, type: 3}
   deactivatedSprite: {fileID: -4039191537819412336, guid: 147c3cc37c21a3a45b5ac22e3f8eaa66, type: 3}
 --- !u!212 &2061961778
