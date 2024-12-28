@@ -2,28 +2,36 @@ using UnityEngine;
 
 public class DemoTrain : Mobile
 {
-    public int movingForward = 0;  // »ğ³µÊÇ·ñÔÚÇ°½ø
-    private int movingbuffer = 0;
-    public Track track;  // ¹ìµÀ¶ÔÏó
-    private int currentTrackIndex = 0;  // µ±Ç°¹ìµÀµãµÄË÷Òı
-    private SpriteRenderer trainRenderer;  // ÓÃÓÚÏÔÊ¾»ğ³µµÄ¾«Áé
+    public int movingForward = 0;                // ç«è½¦æ˜¯å¦åœ¨å‰è¿›
+    private int movingbuffer = 0;                // MovingForwardçš„buffer
+    private bool isMovingThisTick = false;       // ...
+    public Track track;                          // è½¨é“å¯¹è±¡
+    private int currentTrackIndex = 0;           // å½“å‰è½¨é“ç‚¹çš„ç´¢å¼•
 
-    // ¹«¹²±äÁ¿£¬ÓÃÓÚÔÚ±à¼­Æ÷ÖĞ°ó¶¨Á½¸ö²»Í¬×´Ì¬µÄSprite
-    public Sprite activatedSprite;  // »ğ³µ¼¤»î×´Ì¬µÄ¾«Áé
-    public Sprite deactivatedSprite;  // »ğ³µÎ´¼¤»î×´Ì¬µÄ¾«Áé
 
-    // ¼ÇÂ¼ÊÇ·ñÕıÔÚ¸½Éí
+    public bool autoDriving = true;
+    public bool playerControllable = false;
+
+    public Switch[] positiveSwitches;
+    public Switch[] negativeSwitches;
+
+    private SpriteRenderer trainRenderer;        // ç”¨äºæ˜¾ç¤ºç«è½¦çš„ç²¾çµ
+    public Sprite activatedSprite;               // ç«è½¦æ¿€æ´»çŠ¶æ€çš„ç²¾çµ
+    public Sprite deactivatedSprite;             // ç«è½¦æœªæ¿€æ´»çŠ¶æ€çš„ç²¾çµ
+
+
+    // è®°å½•æ˜¯å¦æ­£åœ¨é™„èº«
     public override void OnPossess()
     {
         isPossessed = true;
-        trainRenderer.sprite = activatedSprite;  // µ±¸½ÉíÊ±£¬Ê¹ÓÃ¼¤»î×´Ì¬µÄ¾«Áé
+        trainRenderer.sprite = activatedSprite;  // å½“é™„èº«æ—¶ï¼Œä½¿ç”¨æ¿€æ´»çŠ¶æ€çš„ç²¾çµ
     }
 
-    // ½â³ı¸½Éí
+    // è§£é™¤é™„èº«
     public override void OnUnpossess()
     {
         isPossessed = false;
-        trainRenderer.sprite = deactivatedSprite;  // µ±Î´¸½ÉíÊ±£¬Ê¹ÓÃÎ´¼¤»î×´Ì¬µÄ¾«Áé
+        trainRenderer.sprite = deactivatedSprite;  // å½“æœªé™„èº«æ—¶ï¼Œä½¿ç”¨æœªæ¿€æ´»çŠ¶æ€çš„ç²¾çµ
     }
 
     void Start()
@@ -35,7 +43,7 @@ public class DemoTrain : Mobile
             return;
         }
 
-        // »ñÈ¡»ğ³µµÄ SpriteRenderer
+        // è·å–ç«è½¦çš„ SpriteRenderer
         trainRenderer = GetComponent<SpriteRenderer>();
         if (trainRenderer == null)
         {
@@ -43,9 +51,9 @@ public class DemoTrain : Mobile
             return;
         }
 
-        // ½«»ğ³µ³õÊ¼Î»ÖÃÉèÖÃÎª¹ìµÀµÄÆğÊ¼µã
+        // å°†ç«è½¦åˆå§‹ä½ç½®è®¾ç½®ä¸ºè½¨é“çš„èµ·å§‹ç‚¹
         transform.position = track.GetPoint(currentTrackIndex);
-        trainRenderer.sprite = deactivatedSprite;  // ³õÊ¼Ê±ÉèÖÃÎªÎ´¼¤»î×´Ì¬
+        trainRenderer.sprite = deactivatedSprite;  // åˆå§‹æ—¶è®¾ç½®ä¸ºæœªæ¿€æ´»çŠ¶æ€
     }
 
     public override string Save()
@@ -70,78 +78,75 @@ public class DemoTrain : Mobile
 
     public override void OnTick(int tick)
     {
-        // ¼ì²éÄ¿±êÎ»ÖÃÊÇ·ñÓĞÎïÌå×èµ² 
-        int next_index = currentTrackIndex;
-        if (movingForward == 1)
-        {
-            next_index++;
-        }
-        else if (movingForward == -1)
-        {
-            next_index--;
-        }
-        /*Debug.Log($"ÏÂÒ»Ö¡ÊÇ{(next_index + track.GetTrackLength()) % track.GetTrackLength()}");*/
+
+        movingForward = movingbuffer;
+
+        // æ£€æŸ¥ç›®æ ‡ä½ç½®æ˜¯å¦æœ‰ç‰©ä½“é˜»æŒ¡ 
+        int next_index = currentTrackIndex + movingForward;  // movingForward = -1 if moving backward
 
         Vector3 targetPosition = track.GetPoint((next_index + track.GetTrackLength()) % track.GetTrackLength());
-        if (CanMoveTo(targetPosition))  // ÏÈ½øĞĞÅö×²¼ì²â
+        if (CanMoveTo(targetPosition))  // å…ˆè¿›è¡Œç¢°æ’æ£€æµ‹
         {
-            // Èç¹ûÄ¿±êÎ»ÖÃÃ»ÓĞÅö×²Ìå£¬¾Í½øĞĞÇ°½ø»òºóÍË
+            // å¦‚æœç›®æ ‡ä½ç½®æ²¡æœ‰ç¢°æ’ä½“ï¼Œå°±è¿›è¡Œå‰è¿›æˆ–åé€€
             if (movingForward == 1)
             {
                 MoveForward();
-                GameManager.Instance.NotifyMobileUpdate();
             }
             else if (movingForward == -1)
             {
                 MoveBackward();
-                GameManager.Instance.NotifyMobileUpdate();
-            }  
+            }
         }
-        /*      
-         *      else
-                {
-                    Debug.Log("Train cannot move due to obstruction!");
-                }*/
-        
+
         gridPosition = GameUtils.RoundVector3Int(transform.position);
     }
 
     void Update()
     {
-        // Íæ¼Ò¿ØÖÆ»ğ³µÇ°½ø»òºóÍË
-        if (Input.GetKeyDown(KeyCode.W))  // W ¼ü¿ØÖÆÇ°½ø
+        
+        // ç©å®¶æ§åˆ¶ç«è½¦å‰è¿›æˆ–åé€€
+        if (playerControllable && isPossessed)
         {
-            if (movingForward != -1)
+            if (Input.GetKeyDown(KeyCode.W))  // W é”®æ§åˆ¶å‰è¿›
             {
+
                 movingbuffer = 1;
+                GameManager.Instance.NotifyMobileUpdate();
+
             }
-            else
-            {
-                movingbuffer = 0;
-            }
-            
-        }
-        else if (Input.GetKeyDown(KeyCode.S))  
-        {
-            if (movingForward != 1)
+            else if (Input.GetKeyDown(KeyCode.S))
             {
                 movingbuffer = -1;
+                GameManager.Instance.NotifyMobileUpdate();
             }
-            else
+            else if (Input.GetKeyDown(KeyCode.E))
             {
                 movingbuffer = 0;
             }
         }
-        movingForward = movingbuffer;
-
+        else if (!playerControllable && (positiveSwitches.Length > 0 || negativeSwitches.Length > 0))
+        {
+            movingbuffer = 0;
+            movingbuffer += (positiveSwitches.Length > 0 && AreSwitchAllPressed(positiveSwitches)) ? 1 : 0;
+            movingbuffer += (negativeSwitches.Length > 0 && AreSwitchAllPressed(negativeSwitches)) ? -1 : 0;
+        }
     }
 
-    // ÏòÇ°ÒÆ¶¯Ò»²½
+    private bool AreSwitchAllPressed(Switch[] switches)
+    {
+        foreach (var sw in switches)
+        {
+            if (!sw.isPressed) return false;
+        }
+        return true;
+    }
+
+    // å‘å‰ç§»åŠ¨ä¸€æ­¥
     private void MoveForward()
     {
-        if ((currentTrackIndex < track.GetTrackLength() - 1 || (track.isLoop && currentTrackIndex == track.GetTrackLength() - 1)) && isPossessed)
+        if ((currentTrackIndex < track.GetTrackLength() - 1 || (track.isLoop && currentTrackIndex == track.GetTrackLength() - 1)) && (isPossessed || autoDriving))
         {
-            currentTrackIndex = (currentTrackIndex + 1) % track.GetTrackLength();  // Ñ­»·¹ìµÀ
+            currentTrackIndex = (currentTrackIndex + 1) % track.GetTrackLength();  // å¾ªç¯è½¨é“
             transform.position = track.GetPoint(currentTrackIndex);
         }
         else
@@ -150,12 +155,12 @@ public class DemoTrain : Mobile
         }
     }
 
-    // ÏòºóÒÆ¶¯Ò»²½
+    // å‘åç§»åŠ¨ä¸€æ­¥
     private void MoveBackward()
     {
-        if ((currentTrackIndex > 0 || (track.isLoop && currentTrackIndex == 0)) && isPossessed)
+        if ((currentTrackIndex > 0 || (track.isLoop && currentTrackIndex == 0)) && (isPossessed || autoDriving))
         {
-            currentTrackIndex = (currentTrackIndex - 1 + track.GetTrackLength()) % track.GetTrackLength();  // Ñ­»·¹ìµÀ
+            currentTrackIndex = (currentTrackIndex - 1 + track.GetTrackLength()) % track.GetTrackLength();  // å¾ªç¯è½¨é“
             transform.position = track.GetPoint(currentTrackIndex);
         }
         else
@@ -164,13 +169,13 @@ public class DemoTrain : Mobile
         }
     }
 
-    // ¼ì²éÄ¿±êÎ»ÖÃÊÇ·ñ¿ÉÒÔÒÆ¶¯µ½
+    // æ£€æŸ¥ç›®æ ‡ä½ç½®æ˜¯å¦å¯ä»¥ç§»åŠ¨åˆ°
     private bool CanMoveTo(Vector3 targetPosition)
     {
-        // Ê¹ÓÃ OverlapCircle À´¼ì²éÄ¿±êÎ»ÖÃÊÇ·ñÓĞÎïÌå×èµ²
+        // ä½¿ç”¨ OverlapCircle æ¥æ£€æŸ¥ç›®æ ‡ä½ç½®æ˜¯å¦æœ‰ç‰©ä½“é˜»æŒ¡
         Collider2D[] colliders = Physics2D.OverlapCircleAll(targetPosition, 0.2f);
 
-        // Èç¹ûÓĞÎïÌå×èµ²£¬·µ»Ø false£»Èç¹ûÃ»ÓĞ×èµ²£¬Ôò·µ»Ø true
+        // å¦‚æœæœ‰ç‰©ä½“é˜»æŒ¡ï¼Œè¿”å› falseï¼›å¦‚æœæ²¡æœ‰é˜»æŒ¡ï¼Œåˆ™è¿”å› true
         return colliders.Length == 0;
     }
 }

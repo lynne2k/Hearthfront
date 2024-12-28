@@ -41,4 +41,9 @@ public static class GameUtils
 
         return p;
     }
+
+    public static int ManhattanDistance(Vector3Int p1, Vector3Int p2)
+    {
+        return Mathf.Abs(p1.x - p2.x) + Mathf.Abs(p1.y - p2.y) + Mathf.Abs(p1.z - p2.z);
+    }
 }

@@ -108,11 +108,13 @@ public class GameManager : MonoBehaviour
             timePassedSinceLastTick = 0f;
         }
 
+        Ghost.Instance.OnTick();
         // Actual Ticking
         if (isTickingThisFrame && currentTick < 600)
         {
             TickOnce();
         }
+
     }
 
 
@@ -126,7 +128,7 @@ public class GameManager : MonoBehaviour
         {
             mob.OnTick(currentTick);
         }
-        Ghost.Instance.OnTick();
+
         isLock = false;
 
         TakeSnapshot(currentTick);

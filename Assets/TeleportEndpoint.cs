@@ -37,7 +37,6 @@ public class TeleportEndPoint : Mobile
         if (isPossessed && Input.GetKeyDown(KeyCode.E))
         {
             bool success = Ghost.Instance.CallSwap(OtherEndpoint);
-            //Debug.Log(gameObject.name + " trying to teleport to " + OtherEndpoint.name + "with succ:" + success.ToString());
         }
     }
 

@@ -9,10 +9,13 @@ public class Ghost : MonoBehaviour
 
     public Mobile currentPossessor;
     public bool isSwapping;
+    public float teleportCooldown = 0f;
     public Mobile swapTarget = null;
 
     [TextArea]
     public List<string> collectedSpells;
+
+
 
 
 
@@ -41,8 +44,9 @@ public class Ghost : MonoBehaviour
             mouseGridPosition.z = 0;
 
             //Debug.Log("Trying to set Ghost to " + mouseGridPosition.ToString() + ", dist: " + Vector3Int.Distance(mouseGridPosition, currentPossessor.gridPosition).ToString());
-            if (Vector3Int.Distance(mouseGridPosition, currentPossessor.gridPosition) < 3.58f)
+            if (GameUtils.ManhattanDistance(mouseGridPosition, currentPossessor.gridPosition) < 3.1f)
             {
+                
                 Mobile targetMob = GameManager.Instance.FindMobileByCoordinate(mouseGridPosition);
                 if (targetMob != null)
                 {
@@ -52,6 +56,8 @@ public class Ghost : MonoBehaviour
             }
             
         }
+        teleportCooldown -= Time.deltaTime;
+        teleportCooldown = teleportCooldown > 0 ? teleportCooldown : 0f;
     }
 
 
@@ -83,6 +89,7 @@ public class Ghost : MonoBehaviour
             swapTarget.OnPossess();
             currentPossessor = swapTarget;
             isSwapping = false;
+            teleportCooldown = 0.1f;
         }
     }
 
@@ -94,7 +101,7 @@ public class Ghost : MonoBehaviour
 
     public bool CallSwap(Mobile targetMob)
     {
-        if (!isSwapping && targetMob != null)
+        if (!isSwapping && targetMob != null && teleportCooldown == 0f)
         {
             swapTarget = targetMob;
             isSwapping = true;
