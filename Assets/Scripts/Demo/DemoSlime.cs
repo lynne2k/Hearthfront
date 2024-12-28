@@ -27,7 +27,8 @@ public class DemoSlime : Mobile
     private Vector3Int targetPositionBuffer;
     private Renderer objectRenderer;
     private bool isMoving;
-    private int stamina = 3;
+    public int initialStamina = 3;
+    public int stamina = 3;
     private int facingX = 1;
     private int facingY = 1;
 
@@ -39,6 +40,8 @@ public class DemoSlime : Mobile
 
     void Start()
     {
+        stamina = initialStamina;
+
         objectRenderer = gameObject.GetComponentInChildren<Renderer>();
         if (objectRenderer != null)
         {

@@ -14,6 +14,8 @@ public class DemoDebugText : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        gameObject.GetComponent<TextMeshProUGUI>().text = GameManager.Instance.timeflowOption.ToString() + ";  " + GameManager.Instance.GetCurrentTick().ToString();
+        gameObject.GetComponent<TextMeshProUGUI>().text =
+            Ghost.Instance.currentPossessor.name + "\n" + 
+            GameManager.Instance.timeflowOption.ToString() + ";  " + GameManager.Instance.GetCurrentTick().ToString();
     }
 }

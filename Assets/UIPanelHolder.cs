@@ -41,6 +41,11 @@ public class UIPanelHolder : MonoBehaviour
         LineUpPanels();
         LineUpGhostPanels();
 
+
+        Ghost.Instance.mainCamera.orthographicSize = 0.95f * Ghost.Instance.mainCamera.orthographicSize + 0.05f * (isOn?2.5f:5f);
+        if (Ghost.Instance.mainCamera.orthographicSize > 4.99f) Ghost.Instance.mainCamera.orthographicSize = 5f;
+        if (Ghost.Instance.mainCamera.orthographicSize < 2.51f) Ghost.Instance.mainCamera.orthographicSize = 2.5f;
+
         if (isOn && Input.GetMouseButtonDown(0))
         {
             // Enumerate HeldPanel, if clicked then move
