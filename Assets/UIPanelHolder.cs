@@ -56,6 +56,8 @@ public class UIPanelHolder : MonoBehaviour
                 {
                     HeldPanelList.Remove(fpanel);
                     GhostPanelList.Add(fpanel);
+                    Ghost.Instance.currentPossessor.spells.Remove(fpanel.spellMetadata + "~" + fpanel.fullText);
+                    Ghost.Instance.collectedSpells.Add(fpanel.spellMetadata + "~" + fpanel.fullText);
                     hasClickedOne = true;
                     break;
                 }
@@ -71,6 +73,8 @@ public class UIPanelHolder : MonoBehaviour
                     {
                         GhostPanelList.Remove(fpanel);
                         HeldPanelList.Add(fpanel);
+                        Ghost.Instance.currentPossessor.spells.Add(fpanel.spellMetadata + "~" + fpanel.fullText);
+                        Ghost.Instance.collectedSpells.Remove(fpanel.spellMetadata + "~" + fpanel.fullText);
                         break;
                     }
                 }
