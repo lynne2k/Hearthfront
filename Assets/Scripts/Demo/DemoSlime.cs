@@ -38,6 +38,11 @@ public class DemoSlime : Mobile
     public LayerMask solidLayer;
 
 
+    private void Awake()
+    {
+        gridPosition = GameUtils.RoundVector3Int(transform.position);
+    }
+
     void Start()
     {
         stamina = initialStamina;
