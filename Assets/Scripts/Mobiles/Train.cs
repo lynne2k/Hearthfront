@@ -2,9 +2,10 @@ using UnityEngine;
 
 public class DemoTrain : Mobile
 {
+    public int movingForward = 0;  // 火车是否在前进
+    private int movingbuffer = 0;
     public Track track;  // 轨道对象
     private int currentTrackIndex = 0;  // 当前轨道点的索引
-    private bool movingForward = true;  // 火车是否在前进
     private SpriteRenderer trainRenderer;  // 用于显示火车的精灵
 
     // 公共变量，用于在编辑器中绑定两个不同状态的Sprite
@@ -27,6 +28,7 @@ public class DemoTrain : Mobile
 
     void Start()
     {
+        movingbuffer = movingForward;
         if (track == null || track.GetTrackLength() < 2)
         {
             Debug.LogError("Track must be assigned and have at least 2 points!");
@@ -69,26 +71,39 @@ public class DemoTrain : Mobile
     public override void OnTick(int tick)
     {
         // 检查目标位置是否有物体阻挡 
-        int next_index = movingForward ? currentTrackIndex + 1 : currentTrackIndex - 1;
-        Debug.Log($"下一帧是{(next_index + track.GetTrackLength()) % track.GetTrackLength()}");
+        int next_index = currentTrackIndex;
+        if (movingForward == 1)
+        {
+            next_index++;
+        }
+        else if (movingForward == -1)
+        {
+            next_index--;
+        }
+        /*Debug.Log($"下一帧是{(next_index + track.GetTrackLength()) % track.GetTrackLength()}");*/
+
         Vector3 targetPosition = track.GetPoint((next_index + track.GetTrackLength()) % track.GetTrackLength());
         if (CanMoveTo(targetPosition))  // 先进行碰撞检测
         {
             // 如果目标位置没有碰撞体，就进行前进或后退
-            if (movingForward)
+            if (movingForward == 1)
             {
                 MoveForward();
+                GameManager.Instance.NotifyMobileUpdate();
             }
-            else
+            else if (movingForward == -1)
             {
                 MoveBackward();
-            }
-            gridPosition = GameUtils.RoundVector3Int(transform.position);
+                GameManager.Instance.NotifyMobileUpdate();
+            }  
         }
-        else
-        {
-            Debug.Log("Train cannot move due to obstruction!");
-        }
+        /*      
+         *      else
+                {
+                    Debug.Log("Train cannot move due to obstruction!");
+                }*/
+        
+        gridPosition = GameUtils.RoundVector3Int(transform.position);
     }
 
     void Update()
@@ -96,12 +111,29 @@ public class DemoTrain : Mobile
         // 玩家控制火车前进或后退
         if (Input.GetKeyDown(KeyCode.W))  // W 键控制前进
         {
-            movingForward = true;
+            if (movingForward != -1)
+            {
+                movingbuffer = 1;
+            }
+            else
+            {
+                movingbuffer = 0;
+            }
+            
         }
-        else if (Input.GetKeyDown(KeyCode.S))  // S 键控制后退
+        else if (Input.GetKeyDown(KeyCode.S))  
         {
-            movingForward = false;
+            if (movingForward != 1)
+            {
+                movingbuffer = -1;
+            }
+            else
+            {
+                movingbuffer = 0;
+            }
         }
+        movingForward = movingbuffer;
+
     }
 
     // 向前移动一步
@@ -147,5 +179,5 @@ public class DemoTrain : Mobile
 public class TrainData
 {
     public int currentIndex;
-    public bool isMovingForward;
+    public int isMovingForward;
 }
