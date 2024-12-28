@@ -60,6 +60,15 @@ public class Ghost : MonoBehaviour
         /*    Camera Movement   */
         transform.position = currentPossessor.transform.position;
         Vector3 targetPosition = new Vector3(transform.position.x, transform.position.y, mainCamera.transform.position.z);
+
+        Vector2 cursorPos = Input.mousePosition;
+        var cursorDelta = mainCamera.ScreenToWorldPoint(cursorPos) - mainCamera.transform.position;
+        targetPosition.x += cursorDelta.x / 30;
+        targetPosition.y += cursorDelta.y / 30;
+
+
+
+
         Vector3 smoothedPosition = Vector3.Lerp(mainCamera.transform.position, targetPosition, 0.05f);
         mainCamera.transform.position = smoothedPosition;
     }
