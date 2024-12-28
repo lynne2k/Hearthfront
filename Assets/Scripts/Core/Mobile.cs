@@ -29,6 +29,7 @@ public abstract class Mobile : MonoBehaviour, ISaveable
 
     [TextArea]
     public List<string> spells;
+    public List<string> acceptingSpellPrefixes;
 
     public string latestData;
     public void SaveData()

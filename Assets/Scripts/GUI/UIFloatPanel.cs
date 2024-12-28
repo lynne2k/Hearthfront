@@ -12,7 +12,8 @@ public class UIFloatPanel : MonoBehaviour
     private Canvas canvas;
 
     public string fullText;
-    public Vector2 expandedSize = new Vector2(300, 120);
+    public string spellMetadata;
+    private Vector2 expandedSize;
     public float animationSpeed = 5f;
 
     public bool isSelected = false;
@@ -24,6 +25,9 @@ public class UIFloatPanel : MonoBehaviour
         panelTransform = GetComponent<RectTransform>();
         panelTextTransform = panelText.GetComponent<RectTransform>();
         panelText.text = fullText;
+
+        expandedSize = panelText.GetPreferredValues(270, 120) + new Vector2(30, 45);
+        expandedSize.x = 300;
     }
 
     void Update()
@@ -46,6 +50,13 @@ public class UIFloatPanel : MonoBehaviour
             panelTransform.sizeDelta = Vector2.Lerp(panelTransform.sizeDelta, new Vector2(200, 60), Time.deltaTime * animationSpeed); // Minimized size
             panelTextTransform.sizeDelta = panelTransform.sizeDelta - new Vector2(30, 30);
         }
+    }
+
+    public bool IsMouseOverlapped()
+    {
+        Vector2 mousePosition = Input.mousePosition;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(panelTransform, mousePosition, canvas.worldCamera, out Vector2 localMousePosition);
+        return panelTransform.rect.Contains(localMousePosition);
     }
 }
 

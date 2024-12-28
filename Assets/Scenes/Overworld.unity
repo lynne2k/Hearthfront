@@ -249,7 +249,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -200, y: 150}
+  m_AnchoredPosition: {x: 0, y: -240}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &72037040
@@ -318,7 +318,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -1573,6 +1573,7 @@ MonoBehaviour:
   isPossessed: 0
   isAlive: 1
   spells: []
+  acceptingSpellPrefixes: []
   latestData: 
   OtherEndpoint: {fileID: 1502996230}
 --- !u!4 &1569592438
@@ -1911,6 +1912,9 @@ MonoBehaviour:
   currentPossessor: {fileID: 1967115909}
   isSwapping: 0
   swapTarget: {fileID: 0}
+  collectedSpells:
+  - Nico
+  - Monesy
   mainCamera: {fileID: 16715077}
 --- !u!4 &1761788397
 Transform:
@@ -1976,6 +1980,7 @@ MonoBehaviour:
   isPossessed: 0
   isAlive: 1
   spells: []
+  acceptingSpellPrefixes: []
   latestData: 
   solidLayer:
     serializedVersion: 2
@@ -2025,11 +2030,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 983048582312371304, guid: 8f3af6739691e4179a94a424488ccc38, type: 3}
       propertyPath: spells.Array.data[0]
-      value: This is Donk.
+      value: M~This is Donk.
       objectReference: {fileID: 0}
     - target: {fileID: 983048582312371304, guid: 8f3af6739691e4179a94a424488ccc38, type: 3}
       propertyPath: spells.Array.data[1]
-      value: 'The Key
+      value: 'M~The Key
 
         Good morning
 
@@ -2037,11 +2042,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 983048582312371304, guid: 8f3af6739691e4179a94a424488ccc38, type: 3}
       propertyPath: spells.Array.data[2]
-      value: Ok
+      value: This script is not mobile
       objectReference: {fileID: 0}
     - target: {fileID: 983048582312371304, guid: 8f3af6739691e4179a94a424488ccc38, type: 3}
       propertyPath: spells.Array.data[3]
       value: Test
+      objectReference: {fileID: 0}
+    - target: {fileID: 983048582312371304, guid: 8f3af6739691e4179a94a424488ccc38, type: 3}
+      propertyPath: acceptingSpellPrefixes.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 983048582312371304, guid: 8f3af6739691e4179a94a424488ccc38, type: 3}
+      propertyPath: acceptingSpellPrefixes.Array.data[0]
+      value: M
       objectReference: {fileID: 0}
     - target: {fileID: 5692449542043637041, guid: 8f3af6739691e4179a94a424488ccc38, type: 3}
       propertyPath: m_LocalPosition.x

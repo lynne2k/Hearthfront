@@ -6,14 +6,17 @@ public class UIPanelHolder : MonoBehaviour
 {
 
     List<UIFloatPanel> HeldPanelList = new();
+    List<UIFloatPanel> GhostPanelList = new();
 
 
     public GameObject panelPrefab;
+    private Canvas canvas;
 
     bool isOn = false;
 
     void Start()
     {
+        canvas = GetComponent<Canvas>();
     }
 
     void Update()
@@ -24,7 +27,9 @@ public class UIPanelHolder : MonoBehaviour
             if (isOn)
             {
                 SetupPanels(Ghost.Instance.currentPossessor);
-                GameManager.Instance.timeflowOption = TimeMode.MANUAL;
+                SetupGhostPanels();
+
+                GameManager.Instance.timeflowOption = TimeMode.PAUSED;
             }
             else
             {
@@ -34,6 +39,44 @@ public class UIPanelHolder : MonoBehaviour
 
         /* Lining up curves */
         LineUpPanels();
+        LineUpGhostPanels();
+
+        if (isOn && Input.GetMouseButtonDown(0))
+        {
+            // Enumerate HeldPanel, if clicked then move
+            // for each panel in HeldPanelList (on the right), if clicked then move.
+            // If no one is clicked in this group, then enumerate over the
+            // GhostPanelList (left panels). 
+            bool hasClickedOne = false;
+            foreach (var fpanel in HeldPanelList)
+            {
+                if (fpanel.spellMetadata.Length == 0) continue;
+
+                if (fpanel.IsMouseOverlapped())
+                {
+                    HeldPanelList.Remove(fpanel);
+                    GhostPanelList.Add(fpanel);
+                    hasClickedOne = true;
+                    break;
+                }
+            }
+            if (!hasClickedOne)
+            {
+                foreach (var fpanel in GhostPanelList)
+                {
+                    if (fpanel.spellMetadata.Length == 0) continue;
+                    if (!Ghost.Instance.currentPossessor.acceptingSpellPrefixes.Contains(fpanel.spellMetadata.Substring(0, 1))) continue;
+
+                    if (fpanel.IsMouseOverlapped())
+                    {
+                        GhostPanelList.Remove(fpanel);
+                        HeldPanelList.Add(fpanel);
+                        break;
+                    }
+                }
+            }
+            
+        }
     }
 
     void DisablePanels()
@@ -43,7 +86,38 @@ public class UIPanelHolder : MonoBehaviour
             Destroy(fpanel.gameObject);
         }
         HeldPanelList.Clear();
+
+        foreach (UIFloatPanel fpanel in GhostPanelList)
+        {
+            Destroy(fpanel.gameObject);
+        }
+        GhostPanelList.Clear();
     }
+
+    void SetupGhostPanels()
+    {
+        foreach (string line in Ghost.Instance.collectedSpells)
+        {
+            GameObject gobj = Instantiate(panelPrefab);
+            UIFloatPanel panel = gobj.GetComponent<UIFloatPanel>();
+
+            var lineparts = line.Split("~");
+            if(lineparts.Length == 1)
+            {
+                panel.fullText = line;
+            }
+            else
+            {
+                panel.spellMetadata = lineparts[0];
+                panel.fullText = lineparts[1];
+            }
+            
+            gobj.transform.SetParent(transform);
+            panel.GetComponent<RectTransform>().anchoredPosition = new Vector2(400, 100);
+            GhostPanelList.Add(panel);
+        }
+    }
+
 
     void SetupPanels(Mobile mob)
     {
@@ -52,7 +126,18 @@ public class UIPanelHolder : MonoBehaviour
         {
             GameObject gobj = Instantiate(panelPrefab);
             UIFloatPanel panel = gobj.GetComponent<UIFloatPanel>();
-            panel.fullText = line;
+
+            var lineparts = line.Split("~");
+            if (lineparts.Length == 1)
+            {
+                panel.fullText = line;
+            }
+            else
+            {
+                panel.spellMetadata = lineparts[0];
+                panel.fullText = lineparts[1];
+            }
+
             gobj.transform.SetParent(transform);
             panel.GetComponent<RectTransform>().anchoredPosition = new Vector2(500, thepos);
             HeldPanelList.Add(panel);
@@ -82,12 +167,44 @@ public class UIPanelHolder : MonoBehaviour
         
         foreach (UIFloatPanel fpanel in HeldPanelList)
         {
-            var targetPos = GameUtils.CubicBezierVector2(idx / curveLength, controlPoint0, controlPoint1, controlPoint2, controlPoint3);
+            if (fpanel.panelTransform == null) continue;
+            var targetPos = GameUtils.CubicBezierVector2(curveLength>0?(idx / curveLength):0.5f, controlPoint0, controlPoint1, controlPoint2, controlPoint3);
             fpanel.panelTransform.anchoredPosition = Vector2.Lerp(fpanel.panelTransform.anchoredPosition, targetPos, Time.deltaTime * 5f);
 
             idx += 1;
             if (fpanel.isSelected) idx += 2;
         }
+    }
 
+    void LineUpGhostPanels()
+    {
+        if (GhostPanelList.Count == 0)
+        {
+            return;
+        }
+        Vector2 controlPoint0 = new Vector2(200, 450);
+        Vector2 controlPoint1 = new Vector2(100, 350);
+        Vector2 controlPoint2 = new Vector2(100, 250);
+        Vector2 controlPoint3 = new Vector2(200, 150);
+
+        float curveLength = GhostPanelList.Count - 1;
+        foreach (UIFloatPanel fpanel in GhostPanelList)
+        {
+            if (fpanel.isSelected)
+            {
+                curveLength += 2;
+            }
+        }
+        int idx = 0;
+
+        foreach (UIFloatPanel fpanel in GhostPanelList)
+        {
+            if (fpanel.panelTransform == null) continue;
+            var targetPos = GameUtils.CubicBezierVector2(curveLength > 0 ? (idx / curveLength) : 0.5f, controlPoint0, controlPoint1, controlPoint2, controlPoint3);
+            fpanel.panelTransform.anchoredPosition = Vector2.Lerp(fpanel.panelTransform.anchoredPosition, targetPos, Time.deltaTime * 5f);
+
+            idx += 1;
+            if (fpanel.isSelected) idx += 2;
+        }
     }
 }

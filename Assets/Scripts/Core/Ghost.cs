@@ -11,6 +11,9 @@ public class Ghost : MonoBehaviour
     public bool isSwapping;
     public Mobile swapTarget = null;
 
+    [TextArea]
+    public List<string> collectedSpells;
+
 
 
     public Camera mainCamera = null;
