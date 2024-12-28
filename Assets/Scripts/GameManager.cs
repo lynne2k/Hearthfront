@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 
 public enum TimeMode
@@ -22,8 +23,8 @@ public class GameManager : MonoBehaviour
     protected float timePassedSinceLastTick = 0;
 
     /* 全图Savable寄存 */
-    private const int chunk_size = 5;
-    private string[] snapshots = new string[chunk_size];
+    private const int chunk_size = 10;
+    private Dictionary<int, string> snapshots = new();
     public bool isLock = false;
 
     public TimeMode timeflowOption = TimeMode.AUTO;
@@ -101,61 +102,77 @@ public class GameManager : MonoBehaviour
             timePassedSinceLastTick = 0f;
         }
 
-
         // Actual Ticking
         if (isTickingThisFrame && currentTick < 600)
         {
-            isLock = true; // 设置读写锁
-
-            currentTick++;
-
-            TakeSnapshot(currentTick);
-            foreach (Mobile mob in allMobiles)
-            {
-                mob.OnTick(currentTick);
-            }
-            Ghost.Instance.OnTick();
-            isLock = false;
+            TickOnce();
         }
-
     }
+
+
+    private int TickOnce()
+    {
+        isLock = true; // 设置读写锁
+
+        currentTick++;
+
+        foreach (Mobile mob in allMobiles)
+        {
+            mob.OnTick(currentTick);
+        }
+        Ghost.Instance.OnTick();
+        isLock = false;
+
+        TakeSnapshot(currentTick);
+
+        return currentTick;
+    }
+
+
+
+    // TakeSnapshot
+    //  - WriteSnapshotsToDiskAndFlush
+    // LoadSnapshot
+    // - ApplySnapshot
 
 
     private void TakeSnapshot(int tick)
     {
-        var snapshotData = new Dictionary<string, string>();
+        var snapshotData = new Dictionary<string, string>(); // all data in this frame
         foreach (var mob in allMobiles)
         {
             string json = mob.Save();
             snapshotData[mob.name] = json;
         }
 
-        string snapshotJson = JsonUtility.ToJson(new SerializableDictionary(snapshotData));
+        string snapshotJson = JsonUtility.ToJson(new SerializableDictionary(snapshotData)); // done making snapshotJson
 
-        // Add the snapshot JSON to the list
-        int index = tick % chunk_size;
-        /*Debug.Log($"index: {index}");*/
-        /*Debug.Log($"snapshots: {snapshots.Length}");*/
-        snapshots[index] = snapshotJson;
+        snapshots[tick] = snapshotJson;
 
-        if ((currentTick + 1) % chunk_size == 0)
+        if (snapshots.Count >= 20) // We store 20 frames in memory; the oldest frames are flushed.
         {
-            WriteSnapshotsToDisk();
+            WriteSnapshotsToDiskAndFlush();
         }
-        /*Debug.Log($"Snapshot taken: {snapshotJson}");*/
     }
 
-    private void WriteSnapshotsToDisk()
+    private void WriteSnapshotsToDiskAndFlush()
     {
+
+        // Two functions:
+        // 1. Write old snapshot to disk
+        // 2. Flush unwanted data out of memory
+        // Didn't check list legitimacy. default it.
+
         var bigDict = new Dictionary<int, string>();
         
         // 保存的Chunk两端的tick序数
-        int startTick = currentTick + 1 - chunk_size;
-        int endTick = currentTick;
+        int startTick = snapshots.Keys.Min();
+        int endTick = startTick + chunk_size - 1;
+
         // 填充chunk字典
         for (int i = startTick; i <= endTick; i++)
         {
-            bigDict[i] = snapshots[i % chunk_size];
+            bigDict[i] = snapshots[i];
         }
 
         // 转为字符串格式并存储，此时无需清理snapshots，后续直接覆盖
@@ -163,23 +180,42 @@ public class GameManager : MonoBehaviour
         string filePath = GetSnapshotFilePath(startTick, endTick);
         File.WriteAllText(filePath, bigJson);
         Debug.Log($"Wrote snapshots {startTick} to {endTick} to disk at {filePath}");
+
+        // Flushing
+        for (int i = startTick; i <= endTick; i++)
+        {
+            snapshots.Remove(i);
+        }
     }
 
     private bool LoadSnapshot(int tickToLoad)
     {
         /* !!!!!!!!!!!!!!! tickToLoad!!! */
-        if ((currentTick + 1) % chunk_size != 0) // 内存中
+        if (snapshots.ContainsKey(tickToLoad)) // 内存中
         {
-            int index = currentTick % chunk_size;
-            string snapshotJson = snapshots[index];
+            string snapshotJson = snapshots[tickToLoad];
             ApplySnapshot(snapshotJson);
+
+
+            List<int> keysToRemove = new List<int>();
+
+
+            foreach (int key in snapshots.Keys)
+            {
+                if (key > tickToLoad) keysToRemove.Add(key);
+            }
+            foreach (int key in keysToRemove)
+            {
+                snapshots.Remove(key);
+            }
+
             return true;
         }
         else
         {
-            int index = currentTick % chunk_size;
-            int startTick = currentTick - index;
-            int endTick = currentTick;
+            int startTick = tickToLoad - tickToLoad % chunk_size;
+            int endTick = startTick + chunk_size - 1;
+
             string filePath = GetSnapshotFilePath(startTick, endTick);
             if (!File.Exists(filePath))
             {
@@ -188,10 +224,11 @@ public class GameManager : MonoBehaviour
             }
 
             string bigJson = File.ReadAllText(filePath);
+            Debug.Log("Reading snapshot file: " + bigJson);
             IntKeyedSerializableDictionary fileDict = JsonUtility.FromJson<IntKeyedSerializableDictionary>(bigJson);
             Dictionary<int, string> bigDict = fileDict.ToDictionary();
             
-            bigDict.TryGetValue(currentTick, out string snapshotJson);
+            bigDict.TryGetValue(tickToLoad, out string snapshotJson);
             
             ApplySnapshot(snapshotJson);
 
@@ -199,8 +236,18 @@ public class GameManager : MonoBehaviour
             {
                 int tick = kvp.Key;
                 string snapshot = kvp.Value;
-                int snapIndex = tick % chunk_size;
-                snapshots[snapIndex] = snapshot;
+                snapshots[tick] = snapshot;
+            }
+
+            List<int> keysToRemove = new List<int>();
+
+            foreach (int key in snapshots.Keys)
+            {
+                if (key > tickToLoad) keysToRemove.Add(key);
+            }
+            foreach (int key in keysToRemove)
+            {
+                snapshots.Remove(key);
             }
 
             return true;
