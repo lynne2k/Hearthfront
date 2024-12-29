@@ -113,7 +113,7 @@ public class Door : MonoBehaviour
     {
         var gridPosition = GameUtils.RoundVector3(transform.position);
         if (Physics2D.OverlapArea(gridPosition - new Vector3(0.2f, 0.2f, 0), gridPosition + new Vector3(0.2f, 0.2f, 0), mobileLayer))
-            return false;
-        return true;
+            return true;
+        return false;
     }
 }

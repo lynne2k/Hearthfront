@@ -36,6 +36,9 @@ public class DemoTrain : Mobile
 
     void Start()
     {
+        // 将火车初始位置设置为轨道的起始点
+        transform.position = track.GetPoint(currentTrackIndex);
+        Debug.Log(transform.position);
         gridPosition = GameUtils.RoundVector3Int(transform.position);
         movingbuffer = movingForward;
         if (track == null || track.GetTrackLength() < 2)
@@ -52,7 +55,7 @@ public class DemoTrain : Mobile
         //    return;
         //}
 
-        // 将火车初始位置设置为轨道的起始点
+        
         transform.position = track.GetPoint(currentTrackIndex);
         //trainRenderer.sprite = deactivatedSprite;  // 初始时设置为未激活状态
     }
@@ -75,6 +78,7 @@ public class DemoTrain : Mobile
         movingForward = data.isMovingForward;
 
         transform.position = track.GetPoint(currentTrackIndex);
+        gridPosition = GameUtils.RoundVector3Int(transform.position);
     }
 
     public override void OnTick(int tick)
