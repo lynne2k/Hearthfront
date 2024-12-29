@@ -169,6 +169,16 @@ public class DemoSlime : Mobile
         return true;
     }
 
+    public bool IsMoving()
+    {
+        return isMoving;
+    }
+
+    public Vector3Int GetTargetPositionBuffer()
+    {
+        return targetPositionBuffer;
+    }
+
 
 
     private Vector3 RoundVector3(Vector3 vector)
