@@ -6,7 +6,7 @@ public class DemoTrain : Mobile
     private int movingbuffer = 0;                // MovingForward的buffer
     private bool isMovingThisTick = false;       // ...
     public Track track;                          // 轨道对象
-    private int currentTrackIndex = 0;           // 当前轨道点的索引
+    public int currentTrackIndex = 0;           // 当前轨道点的索引
 
 
     public bool autoDriving = true;
