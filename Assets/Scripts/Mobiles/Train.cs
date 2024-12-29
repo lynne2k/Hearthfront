@@ -36,6 +36,7 @@ public class DemoTrain : Mobile
 
     void Start()
     {
+        gridPosition = GameUtils.RoundVector3Int(transform.position);
         movingbuffer = movingForward;
         if (track == null || track.GetTrackLength() < 2)
         {
