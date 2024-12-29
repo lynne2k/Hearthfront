@@ -7,10 +7,15 @@ public class Door : MonoBehaviour
     private Collider2D doorCollider;  // 门的碰撞器
 
     // 公共变量，用于在编辑器中绑定两个不同状态的Sprite
-    public Sprite openDoorSprite;
-    public Sprite closedDoorSprite;
+    public Sprite[] sprites;
 
     public Switch[] switches;
+
+
+    public int frameIndex = 0;
+    private float animationFrameCooldown = 0f;
+
+    private LayerMask mobileLayer = 1 << 11;
 
     private void Start()
     {
@@ -31,12 +36,14 @@ public class Door : MonoBehaviour
         // 初始时设置门的状态
         if (isOpen)
         {
-            doorRenderer.sprite = openDoorSprite;
+            frameIndex = 0;
+            doorRenderer.sprite = sprites[0];
             doorCollider.enabled = false;  // 开门时禁用碰撞器
         }
         else
         {
-            doorRenderer.sprite = closedDoorSprite;
+            frameIndex = sprites.Length - 1;
+            doorRenderer.sprite = sprites[sprites.Length - 1];
             doorCollider.enabled = true;   // 关门时启用碰撞器
         }
     }
@@ -56,6 +63,28 @@ public class Door : MonoBehaviour
         {
             CloseDoor();
         }
+        
+    }
+
+    private void LateUpdate()
+    {
+        if (isOpen && frameIndex != 0 && animationFrameCooldown <= 0f)
+        {
+            frameIndex--;
+            animationFrameCooldown = 0.1f;
+        }
+        else if (!isOpen && frameIndex != sprites.Length - 1 && animationFrameCooldown <= 0f && !checkCollision())
+        {
+            frameIndex++;
+            animationFrameCooldown = 0.1f;
+        }
+        else
+        {
+            animationFrameCooldown -= Time.deltaTime;
+            animationFrameCooldown = animationFrameCooldown <= 0f ? 0f : animationFrameCooldown;
+        }
+
+        doorRenderer.sprite = sprites[frameIndex];
     }
 
 
@@ -65,7 +94,6 @@ public class Door : MonoBehaviour
         if (!isOpen)
         {
             isOpen = true;
-            doorRenderer.sprite = openDoorSprite;  // 设置门为打开状态的精灵
             doorCollider.enabled = false;  // 禁用碰撞器
             Debug.Log("Door opened");
         }
@@ -76,9 +104,16 @@ public class Door : MonoBehaviour
         if (isOpen)
         {
             isOpen = false;
-            doorRenderer.sprite = closedDoorSprite;  // 设置门为关闭状态的精灵
             doorCollider.enabled = true;   // 启用碰撞器
             Debug.Log("Door closed");
         }
+    }
+
+    private bool checkCollision()
+    {
+        var gridPosition = GameUtils.RoundVector3(transform.position);
+        if (Physics2D.OverlapArea(gridPosition - new Vector3(0.2f, 0.2f, 0), gridPosition + new Vector3(0.2f, 0.2f, 0), mobileLayer))
+            return false;
+        return true;
     }
 }

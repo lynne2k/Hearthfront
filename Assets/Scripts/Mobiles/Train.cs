@@ -15,23 +15,23 @@ public class DemoTrain : Mobile
     public Switch[] positiveSwitches;
     public Switch[] negativeSwitches;
 
-    private SpriteRenderer trainRenderer;        // 用于显示火车的精灵
-    public Sprite activatedSprite;               // 火车激活状态的精灵
-    public Sprite deactivatedSprite;             // 火车未激活状态的精灵
+    //private SpriteRenderer trainRenderer;        // 用于显示火车的精灵
+    //public Sprite activatedSprite;               // 火车激活状态的精灵
+    //public Sprite deactivatedSprite;             // 火车未激活状态的精灵
 
 
     // 记录是否正在附身
     public override void OnPossess()
     {
         isPossessed = true;
-        trainRenderer.sprite = activatedSprite;  // 当附身时，使用激活状态的精灵
+        //trainRenderer.sprite = activatedSprite;  // 当附身时，使用激活状态的精灵
     }
 
     // 解除附身
     public override void OnUnpossess()
     {
         isPossessed = false;
-        trainRenderer.sprite = deactivatedSprite;  // 当未附身时，使用未激活状态的精灵
+        //trainRenderer.sprite = deactivatedSprite;  // 当未附身时，使用未激活状态的精灵
     }
 
     void Start()
@@ -44,16 +44,16 @@ public class DemoTrain : Mobile
         }
 
         // 获取火车的 SpriteRenderer
-        trainRenderer = GetComponent<SpriteRenderer>();
-        if (trainRenderer == null)
-        {
-            Debug.LogError("SpriteRenderer not found on Train object. Please add one.");
-            return;
-        }
+        //trainRenderer = GetComponent<SpriteRenderer>();
+        //if (trainRenderer == null)
+        //{
+        //    Debug.LogError("SpriteRenderer not found on Train object. Please add one.");
+        //    return;
+        //}
 
         // 将火车初始位置设置为轨道的起始点
         transform.position = track.GetPoint(currentTrackIndex);
-        trainRenderer.sprite = deactivatedSprite;  // 初始时设置为未激活状态
+        //trainRenderer.sprite = deactivatedSprite;  // 初始时设置为未激活状态
     }
 
     public override string Save()
@@ -177,6 +177,13 @@ public class DemoTrain : Mobile
 
         // 如果有物体阻挡，返回 false；如果没有阻挡，则返回 true
         return colliders.Length == 0;
+    }
+
+    public Vector3 GetNextPosition()
+    {
+        int next_index = currentTrackIndex + movingForward;  // movingForward = -1 if moving backward
+        Vector3 targetPosition = track.GetPoint((next_index + track.GetTrackLength()) % track.GetTrackLength());
+        return targetPosition;
     }
 }
 
