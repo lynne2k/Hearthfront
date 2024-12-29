@@ -81,10 +81,10 @@ public class GameManager : MonoBehaviour
             isLock = false;
             /*Debug.Log($"currentTick: {currentTick}");*/
         }
-        else if (Input.GetKeyDown(KeyCode.Space))
-        {
-            timeflowOption = timeflowOption == TimeMode.AUTO ? TimeMode.MANUAL : TimeMode.AUTO;
-        }
+        //else if (Input.GetKeyDown(KeyCode.Space))
+        //{
+        //    timeflowOption = timeflowOption == TimeMode.AUTO ? TimeMode.MANUAL : TimeMode.AUTO;
+        //}
 
 
         /* Ticking */
@@ -96,7 +96,7 @@ public class GameManager : MonoBehaviour
             isTickingThisFrame = true;
             timePassedSinceLastTick = 0f;
         }
-        else if (timeflowOption == TimeMode.MANUAL && Input.GetKeyDown(KeyCode.P))
+        else if (timeflowOption == TimeMode.MANUAL && Input.GetKeyDown(KeyCode.Space))
         {
             isTickingThisFrame = true;
             timePassedSinceLastTick = 0f;

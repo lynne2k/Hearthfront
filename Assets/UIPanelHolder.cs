@@ -23,7 +23,7 @@ public class UIPanelHolder : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha0))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             isOn = !isOn;
             if (isOn)
@@ -36,6 +36,7 @@ public class UIPanelHolder : MonoBehaviour
             else
             {
                 DisablePanels();
+                GameManager.Instance.timeflowOption = TimeMode.MANUAL;
             }
         }
 
@@ -87,14 +88,6 @@ public class UIPanelHolder : MonoBehaviour
                 }
             }
             
-        }
-
-        if (isOn && cvRenderer != null)
-        {
-            cvRenderer.SetAlpha(0.8f);
-        } else if (cvRenderer != null)
-        {
-            cvRenderer.SetAlpha(0.5f);
         }
     }
 
