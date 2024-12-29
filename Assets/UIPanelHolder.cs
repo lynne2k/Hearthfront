@@ -11,12 +11,14 @@ public class UIPanelHolder : MonoBehaviour
 
     public GameObject panelPrefab;
     private Canvas canvas;
+    private CanvasRenderer cvRenderer; 
 
     bool isOn = false;
 
     void Start()
     {
         canvas = GetComponent<Canvas>();
+        cvRenderer = GetComponentInChildren<CanvasRenderer>();
     }
 
     void Update()
@@ -85,6 +87,14 @@ public class UIPanelHolder : MonoBehaviour
                 }
             }
             
+        }
+
+        if (isOn && cvRenderer != null)
+        {
+            cvRenderer.SetAlpha(0.8f);
+        } else if (cvRenderer != null)
+        {
+            cvRenderer.SetAlpha(0.5f);
         }
     }
 

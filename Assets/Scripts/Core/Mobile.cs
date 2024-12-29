@@ -31,6 +31,8 @@ public abstract class Mobile : MonoBehaviour, ISaveable
     public List<string> spells;
     public List<string> acceptingSpellPrefixes;
 
+    public string ToolTip;
+
     public string latestData;
     public void SaveData()
     {
