@@ -8,6 +8,7 @@ public class DemoSlimeAnimation : MonoBehaviour
     DemoSlime slime = null;
 
     public Sprite[] sprites;
+    public Sprite[] spritesOff;
     private SpriteRenderer sprRenderer;
 
 
@@ -28,6 +29,7 @@ public class DemoSlimeAnimation : MonoBehaviour
     void LateUpdate()
     {
 
+        var sprs = slime.isPossessed ? sprites : spritesOff;
         // Moving
         var targetPosition = slime.IsMoving() ? slime.GetTargetPositionBuffer() : slime.transform.position;
         absolutePosition = Vector3.SmoothDamp(absolutePosition, targetPosition, ref currentVelocity, 1f / moveSpeed);
@@ -42,6 +44,6 @@ public class DemoSlimeAnimation : MonoBehaviour
 
 
         if (0 <= slime.stamina && slime.stamina <= 3)
-            sprRenderer.sprite = sprites[3 - slime.stamina];
+            sprRenderer.sprite = sprs[3 - slime.stamina];
     }
 }

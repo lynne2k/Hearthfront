@@ -6,7 +6,7 @@ public class StatisBlockAnimation : MonoBehaviour
 {
 
     DemoPathPoint statisBlock = null;
-    Animator animator = null;
+    SpriteRenderer sprRenderer = null;
 
     public Sprite[] frames;
 
@@ -14,20 +14,16 @@ public class StatisBlockAnimation : MonoBehaviour
     void Start()
     {
         statisBlock = GetComponentInParent<DemoPathPoint>();
-        animator = GetComponent<Animator>();
+        sprRenderer = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (statisBlock.isPossessed)
-        {
-            animator.SetInteger("frame", 1);
-        }
-        else
-        {
-            animator.SetInteger("frame", 0);
-        }
+
+
+            sprRenderer.sprite = statisBlock.isPossessed ? frames[0] : frames[1];
+
            
 
     }

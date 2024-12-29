@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 6560776564924775424}
   - component: {fileID: 8850573954566425474}
   - component: {fileID: 3715000420888396606}
-  - component: {fileID: 5566197563023066255}
   m_Layer: 11
   m_Name: Sprite
   m_TagString: Untagged
@@ -98,28 +97,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e34dff70fc3f4b8e96d6974b7298a2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frames: []
---- !u!95 &5566197563023066255
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2865630064950718120}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 53d6ee18489e94c23910bd32dcf3a909, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  frames:
+  - {fileID: 2101149044, guid: b473b3aa58cf14cfba8184a8d083bedb, type: 3}
+  - {fileID: 1808907141, guid: b473b3aa58cf14cfba8184a8d083bedb, type: 3}
 --- !u!1 &6125446298144138816
 GameObject:
   m_ObjectHideFlags: 0
@@ -169,6 +149,8 @@ MonoBehaviour:
   gridPosition: {x: 0, y: 2, z: 0}
   isPossessed: 0
   isAlive: 1
+  spells: []
+  acceptingSpellPrefixes: []
   latestData: 
 --- !u!61 &1929739507157250223
 BoxCollider2D:
