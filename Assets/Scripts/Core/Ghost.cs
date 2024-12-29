@@ -12,8 +12,17 @@ public class Ghost : MonoBehaviour
     public float teleportCooldown = 0f;
     public Mobile swapTarget = null;
 
+    public GameObject glowerPrefabbo;
+    public Sprite hintSprite;
+
     [TextArea]
     public List<string> collectedSpells;
+
+    private bool previewPositions = false;
+
+
+
+    private List<SpriteRenderer> glowers = new();
 
 
 
@@ -48,7 +57,7 @@ public class Ghost : MonoBehaviour
             {
                 
                 Mobile targetMob = GameManager.Instance.FindMobileByCoordinate(mouseGridPosition);
-                if (targetMob != null)
+                if (targetMob != null && (targetMob.keyFilter.Length == 0 || CheckKeys(targetMob.keyFilter)))
                 {
                     swapTarget = targetMob;
                     isSwapping = true;
@@ -58,6 +67,39 @@ public class Ghost : MonoBehaviour
         }
         teleportCooldown -= Time.deltaTime;
         teleportCooldown = teleportCooldown > 0 ? teleportCooldown : 0f;
+
+        if (Input.GetKey(KeyCode.LeftShift) && !previewPositions)
+        {
+            previewPositions = true;
+            foreach (Mobile mob in GameManager.Instance.allMobiles)
+            {
+                GameObject gobj = Instantiate(glowerPrefabbo);
+                SpriteRenderer rnd = gobj.GetComponent<SpriteRenderer>();
+                gobj.transform.SetParent(transform);
+                gobj.transform.position = mob.transform.position;
+                if (mob.spells.Count > 0)
+                {
+                    rnd.color = new Color(0, 1, 0, 0.5f);
+                }
+                glowers.Add(rnd);
+            }
+            GameObject gobjb = Instantiate(glowerPrefabbo);
+            SpriteRenderer rndb = gobjb.GetComponent<SpriteRenderer>();
+            rndb.sprite = hintSprite;
+            gobjb.transform.SetParent(transform);
+            gobjb.transform.position = Ghost.Instance.currentPossessor.transform.position;
+            glowers.Add(rndb);
+
+        }
+        else if (!Input.GetKey(KeyCode.LeftShift) && previewPositions)
+        {
+            previewPositions = false;
+            foreach (SpriteRenderer glower in glowers)
+            {
+                Destroy(glower.gameObject);
+            }
+            glowers.Clear();
+        }
     }
 
 
@@ -90,6 +132,7 @@ public class Ghost : MonoBehaviour
             currentPossessor = swapTarget;
             isSwapping = false;
             teleportCooldown = 0.1f;
+            GetComponent<AudioSource>().Play();
         }
     }
 
@@ -106,6 +149,18 @@ public class Ghost : MonoBehaviour
             swapTarget = targetMob;
             isSwapping = true;
             return true;
+        }
+        return false;
+    }
+
+    private bool CheckKeys(string keyFilter)
+    {
+        foreach (string key in Ghost.Instance.collectedSpells)
+        {
+            if (keyFilter.Contains(key[0]))
+            {
+                return true;
+            }
         }
         return false;
     }

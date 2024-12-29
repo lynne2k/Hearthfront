@@ -100,6 +100,7 @@ public class DemoSlime : Mobile
             gridPosition = targetPositionBuffer;  // RoundVector3Int(transform.position);
             isMoving = false;
             stamina -= 1;
+            GetComponent<AudioSource>().Play();
         }
         
     }

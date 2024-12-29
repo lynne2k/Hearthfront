@@ -79,6 +79,8 @@ public class GameManager : MonoBehaviour
                 }
             }
             isLock = false;
+
+            GetComponentInChildren<SuperAudioManager>().PlayRewind();
             /*Debug.Log($"currentTick: {currentTick}");*/
         }
         //else if (Input.GetKeyDown(KeyCode.Space))
