@@ -97,7 +97,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0abb5b48e6a541d482813dde4f4a68a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sprites: []
+  sprites:
+  - {fileID: 21300000, guid: 466fa5e5d2ee143f798f0b7d619d173d, type: 3}
+  - {fileID: 21300000, guid: 3c02bea4c48414a82bc7c48553a8e050, type: 3}
 --- !u!1 &7993828926977320341
 GameObject:
   m_ObjectHideFlags: 0
@@ -153,7 +155,5 @@ MonoBehaviour:
   track: {fileID: 0}
   autoDriving: 1
   playerControllable: 0
-  positiveSwitches:
-  - {fileID: 0}
-  negativeSwitches:
-  - {fileID: 0}
+  positiveSwitches: []
+  negativeSwitches: []

@@ -20,7 +20,10 @@ public class TrainAnimation : MonoBehaviour
         train = GetComponentInParent<DemoTrain>();
         absolutePosition = train.transform.position;
         sprRenderer = GetComponent<SpriteRenderer>();
-        sprRenderer.sprite = sprites[0];
+        if (train.isPossessed)
+            sprRenderer.sprite = sprites[0];
+        else
+            sprRenderer.sprite = sprites[1];
     }
 
 
@@ -37,6 +40,7 @@ public class TrainAnimation : MonoBehaviour
             // shaking
             transform.position += new Vector3(0f, Mathf.Sin(Time.time * 0.1f) * 0.02f, 0f);
         }
+        sprRenderer.sprite = train.isPossessed?sprites[0]:sprites[1];
     }
 }
 

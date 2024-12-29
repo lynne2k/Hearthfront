@@ -204,3 +204,8 @@ MonoBehaviour:
   - {fileID: 52507522, guid: b467badacf8844a7e9e4596bb7e7d905, type: 3}
   - {fileID: -1184738098, guid: b467badacf8844a7e9e4596bb7e7d905, type: 3}
   - {fileID: -1245395006, guid: b467badacf8844a7e9e4596bb7e7d905, type: 3}
+  spritesOff:
+  - {fileID: 1762097405, guid: 42cbc100d95184f3eb9ed91ed944310c, type: 3}
+  - {fileID: -116121589, guid: 42cbc100d95184f3eb9ed91ed944310c, type: 3}
+  - {fileID: 1515184978, guid: 42cbc100d95184f3eb9ed91ed944310c, type: 3}
+  - {fileID: 1110488849, guid: 42cbc100d95184f3eb9ed91ed944310c, type: 3}
