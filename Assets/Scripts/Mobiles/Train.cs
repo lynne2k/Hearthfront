@@ -77,14 +77,20 @@ public class DemoTrain : Mobile
         currentTrackIndex = data.currentIndex;
         movingForward = data.isMovingForward;
 
+
         transform.position = track.GetPoint(currentTrackIndex);
         gridPosition = GameUtils.RoundVector3Int(transform.position);
+        isMovingThisTick = false;
     }
 
     public override void OnTick(int tick)
     {
-
-        movingForward = movingbuffer;
+        if (isMovingThisTick)
+        {
+            isMovingThisTick = false;
+            movingForward = movingbuffer;
+        }
+        
 
         // 检查目标位置是否有物体阻挡 
         int next_index = currentTrackIndex + movingForward;  // movingForward = -1 if moving backward
@@ -117,16 +123,19 @@ public class DemoTrain : Mobile
 
                 movingbuffer = 1;
                 GameManager.Instance.NotifyMobileUpdate();
+                isMovingThisTick = true;
 
             }
             else if (Input.GetKeyDown(KeyCode.S))
             {
                 movingbuffer = -1;
                 GameManager.Instance.NotifyMobileUpdate();
+                isMovingThisTick = true;
             }
             else if (Input.GetKeyDown(KeyCode.E))
             {
                 movingbuffer = 0;
+                isMovingThisTick = true;
             }
         }
         else if (!playerControllable && (positiveSwitches.Length > 0 || negativeSwitches.Length > 0))
@@ -134,6 +143,7 @@ public class DemoTrain : Mobile
             movingbuffer = 0;
             movingbuffer += (positiveSwitches.Length > 0 && AreSwitchAllPressed(positiveSwitches)) ? 1 : 0;
             movingbuffer += (negativeSwitches.Length > 0 && AreSwitchAllPressed(negativeSwitches)) ? -1 : 0;
+            isMovingThisTick = true;
         }
     }
 
