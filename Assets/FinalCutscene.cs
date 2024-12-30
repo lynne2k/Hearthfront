@@ -36,16 +36,16 @@ public class FinalCutscene : MonoBehaviour
         {
 
             timePassed += Time.deltaTime;
-            if (timePassed > 15f)
+            if (timePassed > 8f)
             {
                 part1.Stop();
                 
             }
-            if (timePassed > 18f)
+            if (timePassed > 10f)
             {
                 part2.Play();
             }
-            if (timePassed > 20f)
+            if (timePassed > 13f)
             {
                 superOverlay.SetAlpha(1f);
             }
