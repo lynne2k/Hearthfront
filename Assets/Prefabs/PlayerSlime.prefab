@@ -52,7 +52,8 @@ MonoBehaviour:
   isAlive: 1
   spells: []
   acceptingSpellPrefixes: []
-  ToolTip: 
+  toolTip: '[WASD] to move'
+  keyFilter: 
   latestData: 
   initialStamina: 3
   stamina: 3

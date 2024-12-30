@@ -49,6 +49,10 @@ MonoBehaviour:
   gridPosition: {x: 0, y: 0, z: 0}
   isPossessed: 0
   isAlive: 1
+  spells: []
+  acceptingSpellPrefixes: []
+  toolTip: '[E] to teleport'
+  keyFilter: 
   latestData: 
   OtherEndpoint: {fileID: 0}
 --- !u!61 &8075254000510986256

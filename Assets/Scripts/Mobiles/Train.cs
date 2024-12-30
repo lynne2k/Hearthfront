@@ -102,10 +102,12 @@ public class DemoTrain : Mobile
             if (movingForward == 1)
             {
                 MoveForward();
+                GetComponent<AudioSource>().Play();
             }
             else if (movingForward == -1)
             {
                 MoveBackward();
+                GetComponent<AudioSource>().Play();
             }
         }
 

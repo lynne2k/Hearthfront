@@ -15,6 +15,7 @@ public class DemoDebugText : MonoBehaviour
     void Update()
     {
         gameObject.GetComponent<TextMeshProUGUI>().text =
+            Ghost.Instance.currentPossessor.toolTip + "\n" +
             Ghost.Instance.currentPossessor.name + "\n" + 
             GameManager.Instance.timeflowOption.ToString() + ";  " + GameManager.Instance.GetCurrentTick().ToString();
     }

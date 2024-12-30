@@ -89,9 +89,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8584db28cc36d4e04b096cf63f3a31ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  panelTransform: {fileID: 0}
   fullText: ABCDEFGHIJKLMNOPQR adioadjwoaidjwaodwa adjiaowdjawoidjao adjaid aid ao
     wdiojadjaowda daod o aodiaowdjoadjaod awidjao
-  expandedSize: {x: 300, y: 120}
+  spellMetadata: 
   animationSpeed: 5
   isSelected: 0
 --- !u!1 &6860693939969748462

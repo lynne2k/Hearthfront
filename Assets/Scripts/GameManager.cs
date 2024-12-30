@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
 
         SnapshotManager.snapshotInterval = snapshotInterval; // 同步interval到SnapshotManager
 
